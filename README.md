@@ -21,6 +21,6 @@ samples, guidance on mobile development, and a full API reference.
 
 | Name | Email | Role | RegistrationID |
 |------|-------|------|----------------|
-| John Smith | john.smith@example.com | Frontend Developer | REG001 |
+| Dulara Jayasanka | dularaj8@gmail.com | Frontend Developer | SEU/IS/20/ICT/013 |
 | Sarah Johnson | sarah.johnson@example.com | Backend Developer | REG002 |
 
