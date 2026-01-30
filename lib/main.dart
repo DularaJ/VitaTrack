@@ -217,6 +217,96 @@ class _MainPagetState extends State<MainPage> {
               ),
             ),
             SizedBox(height: 30,),
+
+            //Add Blood Pressure Section
+            Text(
+              'Enter Blood Sugar Record',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.orange[700],
+              ),
+            ),
+            SizedBox(height: 15),
+
+            TextField(
+              controller: null,
+              decoration: InputDecoration(
+                labelText: 'Date',
+                hintText: '28/01/2026',
+                prefixIcon: Icon(Icons.calendar_today, color: Colors.teal),
+                suffixIcon: Icon(Icons.arrow_drop_down, color: Colors.teal),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.teal, width: 2),
+                ),
+              ),
+            ),
+            SizedBox(height: 15),
+
+            TextField(
+              controller: null,
+              decoration: InputDecoration(
+                labelText: 'Time',
+                hintText: '10:30 AM',
+                prefixIcon: Icon(Icons.access_time, color: Colors.teal),
+                suffixIcon: Icon(Icons.arrow_drop_down, color: Colors.teal),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.teal, width: 2),
+                ),
+              ),
+            ),
+            SizedBox(height: 15),
+
+            TextField(
+              controller: null,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'Blood Sugar (mg/dL)',
+                hintText: 'e.g., 110',
+                prefixIcon: Icon(Icons.opacity, color: Colors.orange),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.teal, width: 2),
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+
+            Container(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  // Function will be added by backend developer
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  padding: EdgeInsets.symmetric(vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: Text(
+                  'Save Blood Sugar Record',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 30),
           ],
         ),
       ),
