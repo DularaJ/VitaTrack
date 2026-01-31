@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'second.dart';
 
-void main(){
+void main() {
   runApp(const MyApp());
 }
 
@@ -10,6 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: MainPage(),
     );
   }
@@ -19,10 +21,48 @@ class MainPage extends StatefulWidget {
   const MainPage({super.key});
 
   @override
-  State<MainPage> createState() => _MainPagetState();
+  State<MainPage> createState() => _MainPageState();
 }
 
-class _MainPagetState extends State<MainPage> {
+class _MainPageState extends State<MainPage> {
+  TextEditingController nameController = TextEditingController();
+  TextEditingController ageController = TextEditingController();
+  TextEditingController bloodPressureController = TextEditingController();
+  TextEditingController bloodSugarController = TextEditingController();
+  TextEditingController dateController = TextEditingController();
+  TextEditingController timeController = TextEditingController();
+
+  DateTime selectedDate = DateTime.now();
+  TimeOfDay selectedTime = TimeOfDay.now();
+
+  Future<void> selectDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+    );
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+        dateController.text = "${picked.day}/${picked.month}/${picked.year}";
+      });
+    }
+  }
+
+  Future<void> selectTime() async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: selectedTime,
+    );
+    if (picked != null && picked != selectedTime) {
+      setState(() {
+        selectedTime = picked;
+        timeController.text = "${picked.hour}:${picked.minute.toString().padLeft(2, '0')}";
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,7 +81,32 @@ class _MainPagetState extends State<MainPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            //Patent Info Section
+            //Patient Info Section
+            Center(
+              child: Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.teal, width: 4),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.3),
+                      spreadRadius: 3,
+                      blurRadius: 7,
+                    ),
+                  ],
+                ),
+                child: CircleAvatar(
+                  radius: 60,
+                  backgroundColor: Colors.teal[100],
+                  backgroundImage: AssetImage('assets/patient.jpg'),
+                  child: null,
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            
             Text(
               'Patient Information',
               style: TextStyle(
@@ -50,20 +115,20 @@ class _MainPagetState extends State<MainPage> {
                 color: Colors.teal,
               ),
             ),
-            SizedBox(height: 15,),
-
+            SizedBox(height: 15),
+            
             //Display Name
             Container(
               padding: EdgeInsets.all(15),
               decoration: BoxDecoration(
                 color: Colors.teal[50],
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.teal,width: 2),
+                border: Border.all(color: Colors.teal, width: 2),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.person, color: Colors.teal,size: 30,),
-                  SizedBox(width: 10,),
+                  Icon(Icons.person, color: Colors.teal, size: 30),
+                  SizedBox(width: 10),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -75,7 +140,7 @@ class _MainPagetState extends State<MainPage> {
                         ),
                       ),
                       Text(
-                        'Dulara J',
+                        'Anuz Nowa',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -87,20 +152,20 @@ class _MainPagetState extends State<MainPage> {
                 ],
               ),
             ),
-            SizedBox(height: 15,),
-
+            SizedBox(height: 15),
+            
             //Display Age
             Container(
               padding: EdgeInsets.all(15),
               decoration: BoxDecoration(
                 color: Colors.teal[50],
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.teal,width: 2),
+                border: Border.all(color: Colors.teal, width: 2),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.cake, color: Colors.teal,size: 30,),
-                  SizedBox(width: 10,),
+                  Icon(Icons.cake, color: Colors.teal, size: 30),
+                  SizedBox(width: 10),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -112,7 +177,7 @@ class _MainPagetState extends State<MainPage> {
                         ),
                       ),
                       Text(
-                        '40 years',
+                        '30 years',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -124,8 +189,8 @@ class _MainPagetState extends State<MainPage> {
                 ],
               ),
             ),
-            SizedBox(height: 15,),
-
+            SizedBox(height: 30),
+            
             //Add Blood Pressure Section
             Text(
               'Add Blood Pressure',
@@ -135,69 +200,75 @@ class _MainPagetState extends State<MainPage> {
                 color: Colors.red,
               ),
             ),
-            SizedBox(height: 15,),
-
-            //select Date
+            SizedBox(height: 15),
+            
+            //select date
             TextField(
-              controller: null,
+              controller: dateController,
+              readOnly: true,
+              onTap: selectDate,
               decoration: InputDecoration(
                 labelText: 'Date',
-                hintText: '29/01/2026',
-                prefixIcon: Icon(Icons.calendar_today, color: Colors.teal,),
-                suffixIcon: Icon(Icons.arrow_drop_down, color: Colors.teal,),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.teal, width: 2),
-                ),
-              ),
-              keyboardType: TextInputType.number,
-            ),
-            SizedBox(height: 15,),
-
-            //select time
-            TextField(
-              controller: null,
-              decoration: InputDecoration(
-                labelText: 'Time',
-                hintText: '10.30 AM',
-                prefixIcon: Icon(Icons.access_time,color: Colors.teal,),
-                suffixIcon: Icon(Icons.arrow_drop_down, color: Colors.teal,),
+                hintText: '28/01/2026',
+                prefixIcon: Icon(Icons.calendar_today, color: Colors.teal),
+                suffixIcon: Icon(Icons.arrow_drop_down, color: Colors.teal),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color:Colors.teal, width: 2),
+                  borderSide: BorderSide(color: Colors.teal, width: 2),
                 ),
               ),
             ),
-            SizedBox(height: 15,),
-
+            SizedBox(height: 15),
+            
+            //select time
+            TextField(
+              controller: timeController,
+              readOnly: true,
+              onTap: selectTime,
+              decoration: InputDecoration(
+                labelText: 'Time',
+                hintText: '10:30 AM',
+                prefixIcon: Icon(Icons.access_time, color: Colors.teal),
+                suffixIcon: Icon(Icons.arrow_drop_down, color: Colors.teal),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.teal, width: 2),
+                ),
+              ),
+            ),
+            SizedBox(height: 15),
+            
             //insert Blood Pressure
             TextField(
-              controller: null,
+              controller: bloodPressureController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 labelText: 'Blood Pressure (mmHg)',
-                hintText: 'e.g: 120/80',
-                prefixIcon: Icon(Icons.favorite, color: Colors.teal,),
+                hintText: 'e.g., 120/80',
+                prefixIcon: Icon(Icons.favorite, color: Colors.red),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(color: Colors.teal, width: 2),
-                )
+                ),
               ),
             ),
-            SizedBox(height: 20,),
-
-            //Save Blood Pressure
+            SizedBox(height: 20),
+            
+            // Save Blood Pressure
             Container(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: (){
-
+                onPressed: () {
+                  // Function will be added by backend developer
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
@@ -216,9 +287,9 @@ class _MainPagetState extends State<MainPage> {
                 ),
               ),
             ),
-            SizedBox(height: 30,),
-
-            //Add Blood Pressure Section
+            SizedBox(height: 30),
+            
+            // Add Blood Sugar Section
             Text(
               'Enter Blood Sugar Record',
               style: TextStyle(
@@ -228,9 +299,11 @@ class _MainPagetState extends State<MainPage> {
               ),
             ),
             SizedBox(height: 15),
-
+            
             TextField(
-              controller: null,
+              controller: dateController,
+              readOnly: true,
+              onTap: selectDate,
               decoration: InputDecoration(
                 labelText: 'Date',
                 hintText: '28/01/2026',
@@ -246,9 +319,11 @@ class _MainPagetState extends State<MainPage> {
               ),
             ),
             SizedBox(height: 15),
-
+            
             TextField(
-              controller: null,
+              controller: timeController,
+              readOnly: true,
+              onTap: selectTime,
               decoration: InputDecoration(
                 labelText: 'Time',
                 hintText: '10:30 AM',
@@ -264,9 +339,9 @@ class _MainPagetState extends State<MainPage> {
               ),
             ),
             SizedBox(height: 15),
-
+            
             TextField(
-              controller: null,
+              controller: bloodSugarController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 labelText: 'Blood Sugar (mg/dL)',
@@ -282,7 +357,7 @@ class _MainPagetState extends State<MainPage> {
               ),
             ),
             SizedBox(height: 20),
-
+            
             Container(
               width: double.infinity,
               child: ElevatedButton(
@@ -307,6 +382,39 @@ class _MainPagetState extends State<MainPage> {
               ),
             ),
             SizedBox(height: 30),
+            
+            Divider(thickness: 2, color: Colors.teal),
+            SizedBox(height: 20),
+            
+            // View Records 
+            Container(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => SecondPage(),
+                  //   ),
+                  // );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal,
+                  padding: EdgeInsets.symmetric(vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: Text(
+                  'View All Records & Charts',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
