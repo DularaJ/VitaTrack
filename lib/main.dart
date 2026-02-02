@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'second.dart';
+import 'profile.dart';
 
 void main() {
   runApp(const MyApp());
@@ -65,6 +66,12 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDesktop = MediaQuery.of(context).size.width >= 900;
+    final bool isTablet = MediaQuery.of(context).size.width >= 600 && MediaQuery.of(context).size.width < 900;
+    final double horizontalPadding = isDesktop ? 60 : (isTablet ? 40 : 20);
+    final double sectionTitleFontSize = isDesktop ? 28 : (isTablet ? 24 : 22);
+    final double labelFontSize = isDesktop ? 18 : (isTablet ? 16 : 14);
+    
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -72,20 +79,36 @@ class _MainPageState extends State<MainPage> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
+            fontSize: isDesktop ? 32 : 24,
           ),
         ),
         backgroundColor: Colors.teal,
+        elevation: 2,
+        actions: [
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: IconButton(
+              icon: Icon(Icons.account_circle, color: Colors.white, size: 30),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfilePage()),
+                );
+              },
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(20),
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             //Patient Info Section
             Center(
               child: Container(
-                width: 120,
-                height: 120,
+                width: isDesktop ? 160 : 120,
+                height: isDesktop ? 160 : 120,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.teal, width: 4),
@@ -98,7 +121,7 @@ class _MainPageState extends State<MainPage> {
                   ],
                 ),
                 child: CircleAvatar(
-                  radius: 60,
+                  radius: isDesktop ? 80 : 60,
                   backgroundColor: Colors.teal[100],
                   backgroundImage: AssetImage('assets/patient.jpg'),
                   child: null,
@@ -110,312 +133,451 @@ class _MainPageState extends State<MainPage> {
             Text(
               'Patient Information',
               style: TextStyle(
-                fontSize: 22,
+                fontSize: sectionTitleFontSize,
                 fontWeight: FontWeight.bold,
                 color: Colors.teal,
               ),
             ),
             SizedBox(height: 15),
             
-            //Display Name
-            Container(
-              padding: EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                color: Colors.teal[50],
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.teal, width: 2),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.person, color: Colors.teal, size: 30),
-                  SizedBox(width: 10),
-                  Column(
+            //Display Name and Age in responsive grid
+            isDesktop
+                ? Row(
+                    children: [
+                      Expanded(child: _buildInfoCard(
+                        icon: Icons.person,
+                        label: 'Patient Name',
+                        value: 'Anuz Nowa',
+                        labelFontSize: labelFontSize,
+                      )),
+                      SizedBox(width: 20),
+                      Expanded(child: _buildInfoCard(
+                        icon: Icons.cake,
+                        label: 'Age',
+                        value: '30 years',
+                        labelFontSize: labelFontSize,
+                      )),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      _buildInfoCard(
+                        icon: Icons.person,
+                        label: 'Patient Name',
+                        value: 'Anuz Nowa',
+                        labelFontSize: labelFontSize,
+                      ),
+                      SizedBox(height: 15),
+                      _buildInfoCard(
+                        icon: Icons.cake,
+                        label: 'Age',
+                        value: '30 years',
+                        labelFontSize: labelFontSize,
+                      ),
+                    ],
+                  ),
+            SizedBox(height: 30),
+            
+            // Two Column Layout for Desktop, Single for Mobile/Tablet
+            isDesktop
+                ? Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Patient Name',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
+                      // Blood Pressure Section
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Add Blood Pressure',
+                              style: TextStyle(
+                                fontSize: sectionTitleFontSize,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red,
+                              ),
+                            ),
+                            SizedBox(height: 15),
+                            _buildDateTimeTextField(
+                              controller: dateController,
+                              label: 'Date',
+                              hint: '28/01/2026',
+                              icon: Icons.calendar_today,
+                              onTap: selectDate,
+                            ),
+                            SizedBox(height: 15),
+                            _buildDateTimeTextField(
+                              controller: timeController,
+                              label: 'Time',
+                              hint: '10:30 AM',
+                              icon: Icons.access_time,
+                              onTap: selectTime,
+                            ),
+                            SizedBox(height: 15),
+                            TextField(
+                              controller: bloodPressureController,
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                labelText: 'Blood Pressure (mmHg)',
+                                hintText: 'e.g., 120/80',
+                                prefixIcon: Icon(Icons.favorite, color: Colors.red),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: Colors.teal, width: 2),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  // Function will be added by backend developer
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  padding: EdgeInsets.symmetric(vertical: 15),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Save Blood Pressure Record',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
+                      SizedBox(width: 30),
+                      // Blood Sugar Section
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Enter Blood Sugar Record',
+                              style: TextStyle(
+                                fontSize: sectionTitleFontSize,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orange[700],
+                              ),
+                            ),
+                            SizedBox(height: 15),
+                            _buildDateTimeTextField(
+                              controller: dateController,
+                              label: 'Date',
+                              hint: '28/01/2026',
+                              icon: Icons.calendar_today,
+                              onTap: selectDate,
+                            ),
+                            SizedBox(height: 15),
+                            _buildDateTimeTextField(
+                              controller: timeController,
+                              label: 'Time',
+                              hint: '10:30 AM',
+                              icon: Icons.access_time,
+                              onTap: selectTime,
+                            ),
+                            SizedBox(height: 15),
+                            TextField(
+                              controller: bloodSugarController,
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                labelText: 'Blood Sugar (mg/dL)',
+                                hintText: 'e.g., 110',
+                                prefixIcon: Icon(Icons.opacity, color: Colors.orange),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: Colors.teal, width: 2),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  // Function will be added by backend developer
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.orange,
+                                  padding: EdgeInsets.symmetric(vertical: 15),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Save Blood Sugar Record',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      //Add Blood Pressure Section
                       Text(
-                        'Anuz Nowa',
+                        'Add Blood Pressure',
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: sectionTitleFontSize,
                           fontWeight: FontWeight.bold,
-                          color: Colors.teal,
+                          color: Colors.red,
+                        ),
+                      ),
+                      SizedBox(height: 15),
+                      _buildDateTimeTextField(
+                        controller: dateController,
+                        label: 'Date',
+                        hint: '28/01/2026',
+                        icon: Icons.calendar_today,
+                        onTap: selectDate,
+                      ),
+                      SizedBox(height: 15),
+                      _buildDateTimeTextField(
+                        controller: timeController,
+                        label: 'Time',
+                        hint: '10:30 AM',
+                        icon: Icons.access_time,
+                        onTap: selectTime,
+                      ),
+                      SizedBox(height: 15),
+                      TextField(
+                        controller: bloodPressureController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: 'Blood Pressure (mmHg)',
+                          hintText: 'e.g., 120/80',
+                          prefixIcon: Icon(Icons.favorite, color: Colors.red),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.teal, width: 2),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            // Function will be added by backend developer
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            padding: EdgeInsets.symmetric(vertical: 15),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text(
+                            'Save Blood Pressure Record',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 30),
+                      // Add Blood Sugar Section
+                      Text(
+                        'Enter Blood Sugar Record',
+                        style: TextStyle(
+                          fontSize: sectionTitleFontSize,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.orange[700],
+                        ),
+                      ),
+                      SizedBox(height: 15),
+                      _buildDateTimeTextField(
+                        controller: dateController,
+                        label: 'Date',
+                        hint: '28/01/2026',
+                        icon: Icons.calendar_today,
+                        onTap: selectDate,
+                      ),
+                      SizedBox(height: 15),
+                      _buildDateTimeTextField(
+                        controller: timeController,
+                        label: 'Time',
+                        hint: '10:30 AM',
+                        icon: Icons.access_time,
+                        onTap: selectTime,
+                      ),
+                      SizedBox(height: 15),
+                      TextField(
+                        controller: bloodSugarController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: 'Blood Sugar (mg/dL)',
+                          hintText: 'e.g., 110',
+                          prefixIcon: Icon(Icons.opacity, color: Colors.orange),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.teal, width: 2),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            // Function will be added by backend developer
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange,
+                            padding: EdgeInsets.symmetric(vertical: 15),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text(
+                            'Save Blood Sugar Record',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-            SizedBox(height: 15),
-            
-            //Display Age
-            Container(
-              padding: EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                color: Colors.teal[50],
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.teal, width: 2),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.cake, color: Colors.teal, size: 30),
-                  SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Age',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      Text(
-                        '30 years',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.teal,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 30),
-            
-            //Add Blood Pressure Section
-            Text(
-              'Add Blood Pressure',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.red,
-              ),
-            ),
-            SizedBox(height: 15),
-            
-            //select date
-            TextField(
-              controller: dateController,
-              readOnly: true,
-              onTap: selectDate,
-              decoration: InputDecoration(
-                labelText: 'Date',
-                hintText: '28/01/2026',
-                prefixIcon: Icon(Icons.calendar_today, color: Colors.teal),
-                suffixIcon: Icon(Icons.arrow_drop_down, color: Colors.teal),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.teal, width: 2),
-                ),
-              ),
-            ),
-            SizedBox(height: 15),
-            
-            //select time
-            TextField(
-              controller: timeController,
-              readOnly: true,
-              onTap: selectTime,
-              decoration: InputDecoration(
-                labelText: 'Time',
-                hintText: '10:30 AM',
-                prefixIcon: Icon(Icons.access_time, color: Colors.teal),
-                suffixIcon: Icon(Icons.arrow_drop_down, color: Colors.teal),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.teal, width: 2),
-                ),
-              ),
-            ),
-            SizedBox(height: 15),
-            
-            //insert Blood Pressure
-            TextField(
-              controller: bloodPressureController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Blood Pressure (mmHg)',
-                hintText: 'e.g., 120/80',
-                prefixIcon: Icon(Icons.favorite, color: Colors.red),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.teal, width: 2),
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-            
-            // Save Blood Pressure
-            Container(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  // Function will be added by backend developer
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  padding: EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: Text(
-                  'Save Blood Pressure Record',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 30),
-            
-            // Add Blood Sugar Section
-            Text(
-              'Enter Blood Sugar Record',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.orange[700],
-              ),
-            ),
-            SizedBox(height: 15),
-            
-            TextField(
-              controller: dateController,
-              readOnly: true,
-              onTap: selectDate,
-              decoration: InputDecoration(
-                labelText: 'Date',
-                hintText: '28/01/2026',
-                prefixIcon: Icon(Icons.calendar_today, color: Colors.teal),
-                suffixIcon: Icon(Icons.arrow_drop_down, color: Colors.teal),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.teal, width: 2),
-                ),
-              ),
-            ),
-            SizedBox(height: 15),
-            
-            TextField(
-              controller: timeController,
-              readOnly: true,
-              onTap: selectTime,
-              decoration: InputDecoration(
-                labelText: 'Time',
-                hintText: '10:30 AM',
-                prefixIcon: Icon(Icons.access_time, color: Colors.teal),
-                suffixIcon: Icon(Icons.arrow_drop_down, color: Colors.teal),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.teal, width: 2),
-                ),
-              ),
-            ),
-            SizedBox(height: 15),
-            
-            TextField(
-              controller: bloodSugarController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Blood Sugar (mg/dL)',
-                hintText: 'e.g., 110',
-                prefixIcon: Icon(Icons.opacity, color: Colors.orange),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.teal, width: 2),
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-            
-            Container(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  // Function will be added by backend developer
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  padding: EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: Text(
-                  'Save Blood Sugar Record',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
             SizedBox(height: 30),
             
             Divider(thickness: 2, color: Colors.teal),
             SizedBox(height: 20),
             
             // View Records 
-            Container(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SecondPage(),
+            Center(
+              child: SizedBox(
+                width: isDesktop ? 400 : double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SecondPage(),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.teal,
+                    padding: EdgeInsets.symmetric(vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.teal,
-                  padding: EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
                   ),
-                ),
-                child: Text(
-                  'View All Records & Charts',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                  child: Text(
+                    'View All Records & Charts',
+                    style: TextStyle(
+                      fontSize: isDesktop ? 16 : 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoCard({
+    required IconData icon,
+    required String label,
+    required String value,
+    required double labelFontSize,
+  }) {
+    return Container(
+      padding: EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: Colors.teal[50],
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.teal, width: 2),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.teal, size: 30),
+          SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: labelFontSize - 2,
+                    color: Colors.grey,
+                  ),
+                ),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: labelFontSize + 6,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.teal,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDateTimeTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return TextField(
+      controller: controller,
+      readOnly: true,
+      onTap: onTap,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        prefixIcon: Icon(icon, color: Colors.teal),
+        suffixIcon: Icon(Icons.arrow_drop_down, color: Colors.teal),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.teal, width: 2),
         ),
       ),
     );

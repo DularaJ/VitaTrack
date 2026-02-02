@@ -13,6 +13,13 @@ class _SecondPageState extends State<SecondPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDesktop = MediaQuery.of(context).size.width >= 900;
+    final bool isTablet = MediaQuery.of(context).size.width >= 600 && MediaQuery.of(context).size.width < 900;
+    final double horizontalPadding = isDesktop ? 60 : (isTablet ? 40 : 20);
+    final double sectionTitleFontSize = isDesktop ? 28 : (isTablet ? 24 : 22);
+    final double buttonFontSize = isDesktop ? 16 : 14;
+    final double tabFontSize = isDesktop ? 18 : 16;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -20,12 +27,14 @@ class _SecondPageState extends State<SecondPage> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
+            fontSize: isDesktop ? 32 : 24,
           ),
         ),
         backgroundColor: Colors.teal,
+        elevation: 2,
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(20),
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -33,137 +42,202 @@ class _SecondPageState extends State<SecondPage> {
             Text(
               'View Charts',
               style: TextStyle(
-                fontSize: 22,
+                fontSize: sectionTitleFontSize,
                 fontWeight: FontWeight.bold,
                 color: Colors.teal,
               ),
             ),
             SizedBox(height: 10),
 
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: (){
-                      // Function will be added by backend developer
-                    }, 
-                    icon: Icon(Icons.show_chart, color: Colors.white,),
-                      label: Text(
-                        'Blood Pressure\nChart',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white, fontSize: 14),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        padding: EdgeInsets.symmetric(vertical: 20),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+            // Responsive Chart Buttons
+            isDesktop
+                ? Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            // Function will be added by backend developer
+                          },
+                          icon: Icon(Icons.show_chart, color: Colors.white),
+                          label: Text(
+                            'Blood Pressure\nChart',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.white, fontSize: buttonFontSize),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            padding: EdgeInsets.symmetric(vertical: 25),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                ),
-                SizedBox(width: 15),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      // Function will be added by backend developer
-                    },
-                    icon: Icon(Icons.analytics, color: Colors.white),
-                    label: Text(
-                      'Blood Sugar\nChart',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white, fontSize: 14),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      padding: EdgeInsets.symmetric(vertical: 20),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                      SizedBox(width: 15),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            // Function will be added by backend developer
+                          },
+                          icon: Icon(Icons.analytics, color: Colors.white),
+                          label: Text(
+                            'Blood Sugar\nChart',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.white, fontSize: buttonFontSize),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange,
+                            padding: EdgeInsets.symmetric(vertical: 25),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            // Function will be added by backend developer
+                          },
+                          icon: Icon(Icons.show_chart, color: Colors.white),
+                          label: Text(
+                            'Blood Pressure Chart',
+                            style: TextStyle(color: Colors.white, fontSize: buttonFontSize),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            padding: EdgeInsets.symmetric(vertical: 20),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            // Function will be added by backend developer
+                          },
+                          icon: Icon(Icons.analytics, color: Colors.white),
+                          label: Text(
+                            'Blood Sugar Chart',
+                            style: TextStyle(color: Colors.white, fontSize: buttonFontSize),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange,
+                            padding: EdgeInsets.symmetric(vertical: 20),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
             SizedBox(height: 30),
 
             //Tab Section
-            Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: (){
-                      setState(() {
-                        selectedTab = 0;
-                      });
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 15),
-                      decoration: BoxDecoration(
-                        color: selectedTab == 0 ? Colors.red : Colors.grey[200],
-                        borderRadius: BorderRadius.circular(10),
+            isDesktop
+                ? Row(
+                    children: [
+                      Expanded(
+                        child: _buildTab(
+                          isSelected: selectedTab == 0,
+                          icon: Icons.favorite,
+                          label: 'Blood Pressure',
+                          onTap: () => setState(() => selectedTab = 0),
+                          fontSize: tabFontSize,
+                          backgroundColor: Colors.red,
+                        ),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      SizedBox(width: 15),
+                      Expanded(
+                        child: _buildTab(
+                          isSelected: selectedTab == 1,
+                          icon: Icons.opacity,
+                          label: 'Blood Sugar',
+                          onTap: () => setState(() => selectedTab = 1),
+                          fontSize: tabFontSize,
+                          backgroundColor: Colors.orange,
+                        ),
+                      ),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      Row(
                         children: [
-                          Icon(
-                            Icons.favorite,
-                            color: selectedTab == 0 ? Colors.white : Colors.grey,
+                          Expanded(
+                            child: _buildTab(
+                              isSelected: selectedTab == 0,
+                              icon: Icons.favorite,
+                              label: 'Blood Pressure',
+                              onTap: () => setState(() => selectedTab = 0),
+                              fontSize: tabFontSize,
+                              backgroundColor: Colors.red,
+                            ),
                           ),
-                          SizedBox(width: 10),
-                          Text(
-                            'Blood Pressure',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: selectedTab == 0 ? Colors.white : Colors.grey,
-                              fontWeight: FontWeight.bold,
+                          SizedBox(width: 15),
+                          Expanded(
+                            child: _buildTab(
+                              isSelected: selectedTab == 1,
+                              icon: Icons.opacity,
+                              label: 'Blood Sugar',
+                              onTap: () => setState(() => selectedTab = 1),
+                              fontSize: tabFontSize,
+                              backgroundColor: Colors.orange,
                             ),
                           ),
                         ],
                       ),
-                    ),
+                    ],
                   ),
-                ),
-                SizedBox(width: 15),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: (){
-                      setState(() {
-                        selectedTab = 1;
-                      });
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 15),
-                      decoration: BoxDecoration(
-                        color: selectedTab == 1 ? Colors.orange : Colors.grey[200],
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.opacity,
-                            color: selectedTab == 1 ? Colors.white : Colors.grey[600],
-                          ),
-                          SizedBox(width: 10),
-                          Text(
-                            'Blood Sugar',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: selectedTab == 1 ? Colors.white : Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
             SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
 
-
+  Widget _buildTab({
+    required bool isSelected,
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    required double fontSize,
+    required Color backgroundColor,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 15),
+        decoration: BoxDecoration(
+          color: isSelected ? backgroundColor : Colors.grey[200],
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? Colors.white : Colors.grey,
+            ),
+            SizedBox(width: 10),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: fontSize,
+                color: isSelected ? Colors.white : Colors.grey,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
       ),
