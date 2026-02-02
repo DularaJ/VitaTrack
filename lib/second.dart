@@ -17,7 +17,7 @@ class _SecondPageState extends State<SecondPage> {
   TextEditingController endDateController = TextEditingController();
 
   // Sample Blood Pressure Data
-  final List<Map<String, dynamic>> bloodPressureData = [
+  List<Map<String, dynamic>> bloodPressureData = [
     {'pressure': '120/80', 'date': '28/01/2026', 'time': '10:30 AM', 'comment': 'Normal', 'count': 1},
     {'pressure': '125/85', 'date': '27/01/2026', 'time': '09:15 AM', 'comment': 'Slightly elevated', 'count': 2},
     {'pressure': '118/78', 'date': '26/01/2026', 'time': '02:45 PM', 'comment': 'Good', 'count': 3},
@@ -26,13 +26,178 @@ class _SecondPageState extends State<SecondPage> {
   ];
 
   // Sample Blood Sugar Data
-  final List<Map<String, dynamic>> bloodSugarData = [
+  List<Map<String, dynamic>> bloodSugarData = [
     {'blood': '110 mg/dL', 'date': '28/01/2026', 'time': '10:30 AM', 'comment': 'Normal', 'count': 1},
     {'blood': '125 mg/dL', 'date': '27/01/2026', 'time': '09:15 AM', 'comment': 'Slightly high', 'count': 2},
     {'blood': '105 mg/dL', 'date': '26/01/2026', 'time': '02:45 PM', 'comment': 'Good', 'count': 3},
     {'blood': '135 mg/dL', 'date': '25/01/2026', 'time': '11:00 AM', 'comment': 'High', 'count': 4},
     {'blood': '100 mg/dL', 'date': '24/01/2026', 'time': '08:30 AM', 'comment': 'Optimal', 'count': 5},
   ];
+
+  // Delete function
+  void _deleteRecord(int index, bool isBloodPressure) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Record'),
+          content: Text('Are you sure you want to delete this record?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  if (isBloodPressure) {
+                    bloodPressureData.removeAt(index);
+                  } else {
+                    bloodSugarData.removeAt(index);
+                  }
+                });
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Record deleted successfully')),
+                );
+              },
+              child: Text('Delete', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Edit function for Blood Pressure
+  void _editBloodPressureRecord(int index) {
+    final record = bloodPressureData[index];
+    TextEditingController pressureController = TextEditingController(text: record['pressure']);
+    TextEditingController commentController = TextEditingController(text: record['comment']);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Edit Blood Pressure Record'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: pressureController,
+                  decoration: InputDecoration(
+                    labelText: 'Blood Pressure',
+                    hintText: 'e.g., 120/80',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 15),
+                TextField(
+                  controller: commentController,
+                  decoration: InputDecoration(
+                    labelText: 'Comment',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 2,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                pressureController.dispose();
+                commentController.dispose();
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  bloodPressureData[index]['pressure'] = pressureController.text;
+                  bloodPressureData[index]['comment'] = commentController.text;
+                });
+                pressureController.dispose();
+                commentController.dispose();
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Record updated successfully')),
+                );
+              },
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Edit function for Blood Sugar
+  void _editBloodSugarRecord(int index) {
+    final record = bloodSugarData[index];
+    TextEditingController bloodSugarController = TextEditingController(text: record['blood']);
+    TextEditingController commentController = TextEditingController(text: record['comment']);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Edit Blood Sugar Record'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: bloodSugarController,
+                  decoration: InputDecoration(
+                    labelText: 'Blood Sugar',
+                    hintText: 'e.g., 110 mg/dL',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 15),
+                TextField(
+                  controller: commentController,
+                  decoration: InputDecoration(
+                    labelText: 'Comment',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 2,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                bloodSugarController.dispose();
+                commentController.dispose();
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  bloodSugarData[index]['blood'] = bloodSugarController.text;
+                  bloodSugarData[index]['comment'] = commentController.text;
+                });
+                bloodSugarController.dispose();
+                commentController.dispose();
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Record updated successfully')),
+                );
+              },
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   Future<void> selectStartDate() async {
     final DateTime? picked = await showDatePicker(
@@ -454,48 +619,80 @@ class _SecondPageState extends State<SecondPage> {
                 DataColumn(label: Text('Date', style: TextStyle(fontWeight: FontWeight.bold))),
                 DataColumn(label: Text('Time', style: TextStyle(fontWeight: FontWeight.bold))),
                 DataColumn(label: Text('Comment', style: TextStyle(fontWeight: FontWeight.bold))),
+                DataColumn(label: Text('Actions', style: TextStyle(fontWeight: FontWeight.bold))),
               ],
               rows: bloodPressureData
+                  .asMap()
+                  .entries
                   .map(
-                    (record) => DataRow(
-                      cells: [
-                        DataCell(Text(record['count'].toString())),
-                        DataCell(
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.red[50],
-                              borderRadius: BorderRadius.circular(5),
-                              border: Border.all(color: Colors.red),
-                            ),
-                            child: Text(
-                              record['pressure'],
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.red,
+                    (entry) {
+                      int index = entry.key;
+                      var record = entry.value;
+                      return DataRow(
+                        cells: [
+                          DataCell(Text(record['count'].toString())),
+                          DataCell(
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.red[50],
+                                borderRadius: BorderRadius.circular(5),
+                                border: Border.all(color: Colors.red),
+                              ),
+                              child: Text(
+                                record['pressure'],
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.red,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        DataCell(Text(record['date'])),
-                        DataCell(Text(record['time'])),
-                        DataCell(Text(record['comment'])),
-                      ],
-                    ),
+                          DataCell(Text(record['date'])),
+                          DataCell(Text(record['time'])),
+                          DataCell(Text(record['comment'])),
+                          DataCell(
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: Icon(Icons.edit, color: Colors.blue, size: 30),
+                                  onPressed: () => _editBloodPressureRecord(index),
+                                  tooltip: 'Edit',
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.delete, color: Colors.red, size: 30),
+                                  onPressed: () => _deleteRecord(index, true),
+                                  tooltip: 'Delete',
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   )
                   .toList(),
             )
           : Column(
               children: bloodPressureData
+                  .asMap()
+                  .entries
                   .map(
-                    (record) => _buildTableCard(
-                      count: record['count'],
-                      mainValue: record['pressure'],
-                      date: record['date'],
-                      time: record['time'],
-                      comment: record['comment'],
-                      color: Colors.red,
-                    ),
+                    (entry) {
+                      int index = entry.key;
+                      var record = entry.value;
+                      return _buildTableCard(
+                        count: record['count'],
+                        mainValue: record['pressure'],
+                        date: record['date'],
+                        time: record['time'],
+                        comment: record['comment'],
+                        color: Colors.red,
+                        onEdit: () => _editBloodPressureRecord(index),
+                        onDelete: () => _deleteRecord(index, true),
+                      );
+                    },
                   )
                   .toList(),
             ),
@@ -514,48 +711,80 @@ class _SecondPageState extends State<SecondPage> {
                 DataColumn(label: Text('Date', style: TextStyle(fontWeight: FontWeight.bold))),
                 DataColumn(label: Text('Time', style: TextStyle(fontWeight: FontWeight.bold))),
                 DataColumn(label: Text('Comment', style: TextStyle(fontWeight: FontWeight.bold))),
+                DataColumn(label: Text('Actions', style: TextStyle(fontWeight: FontWeight.bold))),
               ],
               rows: bloodSugarData
+                  .asMap()
+                  .entries
                   .map(
-                    (record) => DataRow(
-                      cells: [
-                        DataCell(Text(record['count'].toString())),
-                        DataCell(
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.orange[50],
-                              borderRadius: BorderRadius.circular(5),
-                              border: Border.all(color: Colors.orange),
-                            ),
-                            child: Text(
-                              record['blood'],
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.orange,
+                    (entry) {
+                      int index = entry.key;
+                      var record = entry.value;
+                      return DataRow(
+                        cells: [
+                          DataCell(Text(record['count'].toString())),
+                          DataCell(
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.orange[50],
+                                borderRadius: BorderRadius.circular(5),
+                                border: Border.all(color: Colors.orange),
+                              ),
+                              child: Text(
+                                record['blood'],
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.orange,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        DataCell(Text(record['date'])),
-                        DataCell(Text(record['time'])),
-                        DataCell(Text(record['comment'])),
-                      ],
-                    ),
+                          DataCell(Text(record['date'])),
+                          DataCell(Text(record['time'])),
+                          DataCell(Text(record['comment'])),
+                          DataCell(
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: Icon(Icons.edit, color: Colors.blue, size: 30),
+                                  onPressed: () => _editBloodSugarRecord(index),
+                                  tooltip: 'Edit',
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.delete, color: Colors.red, size: 30),
+                                  onPressed: () => _deleteRecord(index, false),
+                                  tooltip: 'Delete',
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   )
                   .toList(),
             )
           : Column(
               children: bloodSugarData
+                  .asMap()
+                  .entries
                   .map(
-                    (record) => _buildTableCard(
-                      count: record['count'],
-                      mainValue: record['blood'],
-                      date: record['date'],
-                      time: record['time'],
-                      comment: record['comment'],
-                      color: Colors.orange,
-                    ),
+                    (entry) {
+                      int index = entry.key;
+                      var record = entry.value;
+                      return _buildTableCard(
+                        count: record['count'],
+                        mainValue: record['blood'],
+                        date: record['date'],
+                        time: record['time'],
+                        comment: record['comment'],
+                        color: Colors.orange,
+                        onEdit: () => _editBloodSugarRecord(index),
+                        onDelete: () => _deleteRecord(index, false),
+                      );
+                    },
                   )
                   .toList(),
             ),
@@ -569,6 +798,8 @@ class _SecondPageState extends State<SecondPage> {
     required String time,
     required String comment,
     required Color color,
+    required VoidCallback onEdit,
+    required VoidCallback onDelete,
   }) {
     return Container(
       margin: EdgeInsets.only(bottom: 12),
@@ -630,6 +861,35 @@ class _SecondPageState extends State<SecondPage> {
                   'Comment: $comment',
                   style: TextStyle(fontSize: 12),
                   overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              ElevatedButton.icon(
+                onPressed: onEdit,
+                icon: Icon(Icons.edit, size: 16),
+                label: Text('Edit'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  minimumSize: Size(0, 0),
+                ),
+              ),
+              SizedBox(width: 8),
+              ElevatedButton.icon(
+                onPressed: onDelete,
+                icon: Icon(Icons.delete, size: 16),
+                label: Text('Delete'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  minimumSize: Size(0, 0),
                 ),
               ),
             ],
