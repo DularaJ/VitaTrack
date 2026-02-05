@@ -12,8 +12,14 @@ class SugarChartPage extends StatefulWidget {
 
 class _SugarChartPageState extends State<SugarChartPage> {
   List<Map<String, dynamic>> records = [];
+  List<FlSpot> chartSpots = [];
   bool isLoading = true;
   String? errorMessage;
+  
+  // Cached statistics
+  int totalRecords = 0;
+  double highestValue = 0;
+  double averageValue = 0;
   
   DateTime? startDate;
   DateTime? endDate;
@@ -24,6 +30,13 @@ class _SugarChartPageState extends State<SugarChartPage> {
   void initState() {
     super.initState();
     _loadRecords();
+  }
+
+  @override
+  void dispose() {
+    startDateController.dispose();
+    endDateController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadRecords() async {
@@ -37,7 +50,6 @@ class _SugarChartPageState extends State<SugarChartPage> {
       int? userId = prefs.getInt('user_id');
       String? userUuid = prefs.getString('user_uuid');
       
-      // If user_id is null, try to get it from uuid
       if (userId == null && userUuid != null) {
         final userData = await SupabaseRepository().getUser(userUuid);
         if (userData != null) {
@@ -48,8 +60,17 @@ class _SugarChartPageState extends State<SugarChartPage> {
       
       if (userId != null) {
         print('Loading sugar records for user_id: $userId');
-        final data = await SupabaseRepository().getSugarRecords(userId);
+        final data = await SupabaseRepository().getSugarRecords(
+          userId,
+          startDate: startDate,
+          endDate: endDate,
+        );
         print('Loaded ${data.length} sugar records');
+        
+        // Pre-calculate chart spots and statistics
+        _calculateChartSpots(data);
+        _calculateStatistics(data);
+        
         setState(() {
           records = data;
         });
@@ -67,6 +88,32 @@ class _SugarChartPageState extends State<SugarChartPage> {
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+  void _calculateChartSpots(List<Map<String, dynamic>> data) {
+    final List<FlSpot> spots = [];
+    for (int i = 0; i < data.length; i++) {
+      final record = data[i];
+      final value = record['value'];
+      if (value != null) {
+        // Use index for x-axis for proper spacing, y-axis is the value
+        spots.add(FlSpot(i.toDouble(), value.toDouble()));
+      }
+    }
+    chartSpots = spots;
+  }
+
+  void _calculateStatistics(List<Map<String, dynamic>> data) {
+    final values = data.map((r) => r['value'] as double?).where((v) => v != null).toList();
+    totalRecords = values.length;
+    
+    if (values.isNotEmpty) {
+      highestValue = values.fold<double>(0, (a, b) => a! > b! ? a : b)!;
+      averageValue = values.fold<double>(0, (a, b) => a! + b!) / values.length;
+    } else {
+      highestValue = 0;
+      averageValue = 0;
     }
   }
 
@@ -110,18 +157,6 @@ class _SugarChartPageState extends State<SugarChartPage> {
       endDateController.clear();
     });
     _loadRecords();
-  }
-
-  List<FlSpot> _getChartSpots() {
-    final List<FlSpot> spots = [];
-    for (int i = 0; i < records.length; i++) {
-      final record = records[i];
-      final value = record['value'];
-      if (value != null) {
-        spots.add(FlSpot(i.toDouble(), value.toDouble()));
-      }
-    }
-    return spots;
   }
 
   @override
@@ -277,7 +312,7 @@ class _SugarChartPageState extends State<SugarChartPage> {
                             style: TextStyle(color: Colors.grey),
                           ),
                           Text(
-                            '${records.length}',
+                            '$totalRecords',
                             style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -293,7 +328,7 @@ class _SugarChartPageState extends State<SugarChartPage> {
                             style: TextStyle(color: Colors.grey),
                           ),
                           Text(
-                            '${records.map((r) => r['value'] as double?).where((v) => v != null).fold<double>(0, (a, b) => a! > b! ? a : b)}',
+                            '${highestValue.toStringAsFixed(0)}',
                             style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -309,7 +344,7 @@ class _SugarChartPageState extends State<SugarChartPage> {
                             style: TextStyle(color: Colors.grey),
                           ),
                           Text(
-                            '${records.where((r) => r['value'] != null).isEmpty ? 0 : (records.map((r) => r['value'] as double?).where((v) => v != null).fold<double>(0, (a, b) => a! + b!) / records.where((r) => r['value'] != null).length).toStringAsFixed(1)}',
+                            '${averageValue.toStringAsFixed(1)}',
                             style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -353,68 +388,9 @@ class _SugarChartPageState extends State<SugarChartPage> {
                               )
                             : LineChart(
                                 LineChartData(
-                                  gridData: FlGridData(
-                                    show: true,
-                                    drawVerticalLine: true,
-                                    horizontalInterval: 20,
-                                    verticalInterval: 1,
-                                  ),
-                                  titlesData: FlTitlesData(
-                                    show: true,
-                                    rightTitles: const AxisTitles(
-                                      sideTitles: SideTitles(showTitles: false),
-                                    ),
-                                    topTitles: const AxisTitles(
-                                      sideTitles: SideTitles(showTitles: false),
-                                    ),
-                                    bottomTitles: AxisTitles(
-                                      sideTitles: SideTitles(
-                                        showTitles: true,
-                                        interval: 1,
-                                        getTitlesWidget: (value, meta) {
-                                          final index = value.toInt();
-                                          if (index >= 0 && index < records.length) {
-                                            final time = records[index]['time'];
-                                            if (time != null) {
-                                              final dateTime = DateTime.parse(time);
-                                              return Text(
-                                                '${dateTime.day}/${dateTime.month}',
-                                                style: const TextStyle(fontSize: 10),
-                                              );
-                                            }
-                                          }
-                                          return const Text('');
-                                        },
-                                      ),
-                                    ),
-                                    leftTitles: AxisTitles(
-                                      sideTitles: SideTitles(
-                                        showTitles: true,
-                                        interval: 20,
-                                        getTitlesWidget: (value, meta) {
-                                          return Text(
-                                            '${value.toInt()}',
-                                            style: const TextStyle(fontSize: 10),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                  borderData: FlBorderData(
-                                    show: true,
-                                    border: Border.all(color: Colors.grey[300]!),
-                                  ),
                                   lineBarsData: [
                                     LineChartBarData(
-                                      spots: _getChartSpots(),
-                                      isCurved: true,
-                                      color: Colors.orange,
-                                      barWidth: 3,
-                                      dotData: const FlDotData(show: true),
-                                      belowBarData: BarAreaData(
-                                        show: true,
-                                        color: Colors.orange.withOpacity(0.1),
-                                      ),
+                                      spots: chartSpots,
                                     ),
                                   ],
                                 ),
