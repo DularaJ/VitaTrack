@@ -41,6 +41,8 @@ class _MainPageState extends State<MainPage> {
   TextEditingController bloodSugarController = TextEditingController();
   TextEditingController dateController = TextEditingController();
   TextEditingController timeController = TextEditingController();
+  TextEditingController bloodPressureCommentController = TextEditingController();
+  TextEditingController bloodSugarCommentController = TextEditingController();
 
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
@@ -273,6 +275,23 @@ class _MainPageState extends State<MainPage> {
                                 ),
                               ),
                             ),
+                            SizedBox(height: 15),
+                            TextField(
+                              controller: bloodPressureCommentController,
+                              decoration: InputDecoration(
+                                labelText: 'Comment (Optional)',
+                                hintText: 'e.g., Normal, High, Low',
+                                prefixIcon: Icon(Icons.note, color: Colors.teal),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: Colors.teal, width: 2),
+                                ),
+                              ),
+                              maxLines: 2,
+                            ),
                             SizedBox(height: 20),
                             SizedBox(
                               width: double.infinity,
@@ -329,12 +348,13 @@ class _MainPageState extends State<MainPage> {
                                     await SupabaseRepository().insertPressure(
                                       userId: userData!['id'],
                                       time: timestamp,
-                                      comment: bp,
+                                      comment: bloodPressureCommentController.text.trim().isEmpty ? null : bloodPressureCommentController.text.trim(),
                                       value: systolic,
                                     );
 
                                     // Clear fields
                                     bloodPressureController.clear();
+                                    bloodPressureCommentController.clear();
                                     dateController.clear();
                                     timeController.clear();
 
@@ -420,6 +440,23 @@ class _MainPageState extends State<MainPage> {
                                 ),
                               ),
                             ),
+                            SizedBox(height: 15),
+                            TextField(
+                              controller: bloodSugarCommentController,
+                              decoration: InputDecoration(
+                                labelText: 'Comment (Optional)',
+                                hintText: 'e.g., Normal, High, Low',
+                                prefixIcon: Icon(Icons.note, color: Colors.teal),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: Colors.teal, width: 2),
+                                ),
+                              ),
+                              maxLines: 2,
+                            ),
                             SizedBox(height: 20),
                             SizedBox(
                               width: double.infinity,
@@ -475,12 +512,13 @@ class _MainPageState extends State<MainPage> {
                                     await SupabaseRepository().insertSugar(
                                       userId: userData!['id'],
                                       time: timestamp,
-                                      comment: bs,
+                                      comment: bloodSugarCommentController.text.trim().isEmpty ? null : bloodSugarCommentController.text.trim(),
                                       value: sugarValue,
                                     );
 
                                     // Clear fields
                                     bloodSugarController.clear();
+                                    bloodSugarCommentController.clear();
                                     dateController.clear();
                                     timeController.clear();
 
@@ -566,6 +604,23 @@ class _MainPageState extends State<MainPage> {
                           ),
                         ),
                       ),
+                      SizedBox(height: 15),
+                      TextField(
+                        controller: bloodPressureCommentController,
+                        decoration: InputDecoration(
+                          labelText: 'Comment (Optional)',
+                          hintText: 'e.g., Normal, High, Low',
+                          prefixIcon: Icon(Icons.note, color: Colors.teal),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.teal, width: 2),
+                          ),
+                        ),
+                        maxLines: 2,
+                      ),
                       SizedBox(height: 20),
                       SizedBox(
                         width: double.infinity,
@@ -622,12 +677,13 @@ class _MainPageState extends State<MainPage> {
                               await SupabaseRepository().insertPressure(
                                 userId: userData!['id'],
                                 time: timestamp,
-                                comment: bp,
+                                comment: bloodPressureCommentController.text.trim().isEmpty ? null : bloodPressureCommentController.text.trim(),
                                 value: systolic,
                               );
 
                               // Clear fields
                               bloodPressureController.clear();
+                              bloodPressureCommentController.clear();
                               dateController.clear();
                               timeController.clear();
 
@@ -706,6 +762,23 @@ class _MainPageState extends State<MainPage> {
                           ),
                         ),
                       ),
+                      SizedBox(height: 15),
+                      TextField(
+                        controller: bloodSugarCommentController,
+                        decoration: InputDecoration(
+                          labelText: 'Comment (Optional)',
+                          hintText: 'e.g., Normal, High, Low',
+                          prefixIcon: Icon(Icons.note, color: Colors.teal),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.teal, width: 2),
+                          ),
+                        ),
+                        maxLines: 2,
+                      ),
                       SizedBox(height: 20),
                       SizedBox(
                         width: double.infinity,
@@ -761,12 +834,13 @@ class _MainPageState extends State<MainPage> {
                               await SupabaseRepository().insertSugar(
                                 userId: userData!['id'],
                                 time: timestamp,
-                                comment: bs,
+                                comment: bloodSugarCommentController.text.trim().isEmpty ? null : bloodSugarCommentController.text.trim(),
                                 value: sugarValue,
                               );
 
                               // Clear fields
                               bloodSugarController.clear();
+                              bloodSugarCommentController.clear();
                               dateController.clear();
                               timeController.clear();
 
