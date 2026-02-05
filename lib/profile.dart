@@ -19,6 +19,9 @@ class _ProfilePageState extends State<ProfilePage> {
   TextEditingController addressController = TextEditingController(text: '123 Health Street, Medical City');
   TextEditingController bloodTypeController = TextEditingController(text: 'O+');
 
+  final List<String> bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+  String? selectedBloodType;
+
   String? userUuid;
   bool isLoading = true;
   bool isEditMode = false;
@@ -54,6 +57,9 @@ class _ProfilePageState extends State<ProfilePage> {
           phoneController.text = userData['phone'] ?? '';
           addressController.text = userData['address'] ?? '';
           bloodTypeController.text = userData['bloodtype'] ?? '';
+          selectedBloodType = bloodTypes.contains(userData['bloodtype']) ? userData['bloodtype'] : 'O+';
+        } else {
+          selectedBloodType = 'O+';
         }
       } catch (e) {
         // User not found or error, keep default values
@@ -323,55 +329,53 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             SizedBox(height: 15),
 
-            _buildTextField(
-              label: 'Blood Type',
-              controller: bloodTypeController,
-              icon: Icons.bloodtype,
-              enabled: isEditMode,
+            // Blood Type Dropdown
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.grey[300]!),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: DropdownButtonFormField<String>(
+                value: selectedBloodType,
+                decoration: InputDecoration(
+                  labelText: 'Blood Type',
+                  prefixIcon: Icon(Icons.bloodtype, color: Colors.red),
+                  border: InputBorder.none,
+                  labelStyle: TextStyle(
+                    fontSize: labelFontSize,
+                    color: Colors.grey[700],
+                  ),
+                ),
+                items: bloodTypes.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(
+                      value,
+                      style: TextStyle(
+                        fontSize: labelFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  );
+                }).toList(),
+                onChanged: isEditMode
+                    ? (String? newValue) {
+                        setState(() {
+                          selectedBloodType = newValue;
+                          bloodTypeController.text = newValue ?? 'O+';
+                        });
+                      }
+                    : null,
+                icon: Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
+                dropdownColor: Colors.white,
+                isExpanded: true,
+              ),
             ),
             SizedBox(height: 15),
 
-            // Info Cards for Health Status
-            isDesktop
-                ? Row(
-                    children: [
-                      Expanded(
-                        child: _buildInfoCard(
-                          title: 'Last BP Reading',
-                          value: '120/80 mmHg',
-                          icon: Icons.favorite,
-                          color: Colors.red,
-                        ),
-                      ),
-                      SizedBox(width: 20),
-                      Expanded(
-                        child: _buildInfoCard(
-                          title: 'Last Sugar Level',
-                          value: '110 mg/dL',
-                          icon: Icons.opacity,
-                          color: Colors.orange,
-                        ),
-                      ),
-                    ],
-                  )
-                : Column(
-                    children: [
-                      _buildInfoCard(
-                        title: 'Last BP Reading',
-                        value: '120/80 mmHg',
-                        icon: Icons.favorite,
-                        color: Colors.red,
-                      ),
-                      SizedBox(height: 15),
-                      _buildInfoCard(
-                        title: 'Last Sugar Level',
-                        value: '110 mg/dL',
-                        icon: Icons.opacity,
-                        color: Colors.orange,
-                      ),
-                    ],
-                  ),
-            SizedBox(height: 30),
 
             // Save Button (only visible in edit mode)
             if (isEditMode)
