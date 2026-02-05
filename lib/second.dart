@@ -185,6 +185,29 @@ class _SecondPageState extends State<SecondPage> {
     }
   }
 
+  // Get the maximum date from all records
+  DateTime _getMaxRecordDate() {
+    DateTime maxDate = DateTime.now();
+    
+    // Check blood pressure records
+    for (var record in originalBloodPressureData) {
+      final recordDate = _parseDateString(record['date']);
+      if (recordDate != null && recordDate.isAfter(maxDate)) {
+        maxDate = recordDate;
+      }
+    }
+    
+    // Check blood sugar records
+    for (var record in originalBloodSugarData) {
+      final recordDate = _parseDateString(record['date']);
+      if (recordDate != null && recordDate.isAfter(maxDate)) {
+        maxDate = recordDate;
+      }
+    }
+    
+    return maxDate;
+  }
+
   // Delete function
   void _deleteRecord(int index, bool isBloodPressure) async {
     if (userData == null) return;
@@ -414,11 +437,12 @@ class _SecondPageState extends State<SecondPage> {
   }
 
   Future<void> selectStartDate() async {
+    final DateTime maxRecordDate = _getMaxRecordDate();
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: startDate ?? DateTime.now(),
       firstDate: DateTime(2020),
-      lastDate: DateTime.now(),
+      lastDate: maxRecordDate,
     );
     if (picked != null) {
       setState(() {
@@ -429,11 +453,12 @@ class _SecondPageState extends State<SecondPage> {
   }
 
   Future<void> selectEndDate() async {
+    final DateTime maxRecordDate = _getMaxRecordDate();
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: endDate ?? DateTime.now(),
       firstDate: startDate ?? DateTime(2020),
-      lastDate: DateTime.now(),
+      lastDate: maxRecordDate,
     );
     if (picked != null) {
       setState(() {
