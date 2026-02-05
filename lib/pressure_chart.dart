@@ -463,6 +463,28 @@ class _PressureChartPageState extends State<PressureChartPage> {
                                       ),
                                     ),
                                   ],
+                                  lineTouchData: LineTouchData(
+                                    touchTooltipData: LineTouchTooltipData(
+                                      getTooltipItems: (spots) {
+                                        return spots.map((spot) {
+                                          final index = spot.x.toInt();
+                                          final time = records[index]['time'];
+                                          String dateTimeStr = '';
+                                          if (time != null) {
+                                            final dateTime = DateTime.parse(time);
+                                            dateTimeStr = '${dateTime.day}/${dateTime.month} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
+                                          }
+                                          return LineTooltipItem(
+                                            '$dateTimeStr\n${spot.y.toStringAsFixed(0)} mmHg',
+                                            const TextStyle(
+                                              color: Colors.red,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          );
+                                        }).toList();
+                                      },
+                                    ),
+                                  ),
                                 ),
                               ),
                       ),

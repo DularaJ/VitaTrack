@@ -464,6 +464,28 @@ class _SugarChartPageState extends State<SugarChartPage> {
                                       ),
                                     ),
                                   ],
+                                  lineTouchData: LineTouchData(
+                                    touchTooltipData: LineTouchTooltipData(
+                                      getTooltipItems: (spots) {
+                                        return spots.map((spot) {
+                                          final index = spot.x.toInt();
+                                          final time = records[index]['time'];
+                                          String dateTimeStr = '';
+                                          if (time != null) {
+                                            final dateTime = DateTime.parse(time);
+                                            dateTimeStr = '${dateTime.day}/${dateTime.month} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
+                                          }
+                                          return LineTooltipItem(
+                                            '$dateTimeStr\n${spot.y.toStringAsFixed(0)} mg/dL',
+                                            const TextStyle(
+                                              color: Colors.orange,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          );
+                                        }).toList();
+                                      },
+                                    ),
+                                  ),
                                 ),
                               ),
                       ),
