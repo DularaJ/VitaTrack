@@ -80,6 +80,12 @@ class _MainPageState extends State<MainPage> {
     setState(() {
       isLoading = false;
     });
+
+    // Set current date and time in controllers
+    DateTime now = DateTime.now();
+    TimeOfDay currentTime = TimeOfDay.now();
+    dateController.text = "${now.day}/${now.month}/${now.year}";
+    timeController.text = "${currentTime.hour}:${currentTime.minute.toString().padLeft(2, '0')}";
   }
 
   Future<void> selectDate() async {
