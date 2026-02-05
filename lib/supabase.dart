@@ -114,4 +114,94 @@ class SupabaseRepository {
   Future<void> deleteVital(int id) async {
     await _client.from('vitals').delete().eq('id', id);
   }
+
+  // Insert a new pressure record
+  Future<void> insertPressure({
+    required int userId,
+    String? time,
+    String? comment,
+    double? value,
+  }) async {
+    await _client.from('pressure').insert({
+      'user': userId,
+      'time': time,
+      'comment': comment,
+      'value': value,
+    });
+  }
+
+  // Insert a new sugar record
+  Future<void> insertSugar({
+    required int userId,
+    String? time,
+    String? comment,
+    double? value,
+  }) async {
+    await _client.from('sugar').insert({
+      'user': userId,
+      'time': time,
+      'comment': comment,
+      'value': value,
+    });
+  }
+
+  // Fetch pressure records for a user
+  Future<List<Map<String, dynamic>>> getPressureRecords(int userId) async {
+    final response = await _client
+        .from('pressure')
+        .select()
+        .eq('user', userId)
+        .order('time', ascending: false);
+    return response;
+  }
+
+  // Fetch sugar records for a user
+  Future<List<Map<String, dynamic>>> getSugarRecords(int userId) async {
+    final response = await _client
+        .from('sugar')
+        .select()
+        .eq('user', userId)
+        .order('time', ascending: false);
+    return response;
+  }
+
+  // Update pressure record
+  Future<void> updatePressure({
+    required int id,
+    String? time,
+    String? comment,
+    double? value,
+  }) async {
+    final updates = <String, dynamic>{};
+    if (time != null) updates['time'] = time;
+    if (comment != null) updates['comment'] = comment;
+    if (value != null) updates['value'] = value;
+
+    await _client.from('pressure').update(updates).eq('id', id);
+  }
+
+  // Update sugar record
+  Future<void> updateSugar({
+    required int id,
+    String? time,
+    String? comment,
+    double? value,
+  }) async {
+    final updates = <String, dynamic>{};
+    if (time != null) updates['time'] = time;
+    if (comment != null) updates['comment'] = comment;
+    if (value != null) updates['value'] = value;
+
+    await _client.from('sugar').update(updates).eq('id', id);
+  }
+
+  // Delete pressure record
+  Future<void> deletePressure(int id) async {
+    await _client.from('pressure').delete().eq('id', id);
+  }
+
+  // Delete sugar record
+  Future<void> deleteSugar(int id) async {
+    await _client.from('sugar').delete().eq('id', id);
+  }
 }

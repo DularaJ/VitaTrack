@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'supabase.dart';
 
 class SecondPage extends StatefulWidget {
   const SecondPage({super.key});
@@ -16,26 +18,88 @@ class _SecondPageState extends State<SecondPage> {
   TextEditingController startDateController = TextEditingController();
   TextEditingController endDateController = TextEditingController();
 
-  // Sample Blood Pressure Data
-  List<Map<String, dynamic>> bloodPressureData = [
-    {'pressure': '120/80', 'date': '28/01/2026', 'time': '10:30 AM', 'comment': 'Normal', 'count': 1},
-    {'pressure': '125/85', 'date': '27/01/2026', 'time': '09:15 AM', 'comment': 'Slightly elevated', 'count': 2},
-    {'pressure': '118/78', 'date': '26/01/2026', 'time': '02:45 PM', 'comment': 'Good', 'count': 3},
-    {'pressure': '130/90', 'date': '25/01/2026', 'time': '11:00 AM', 'comment': 'Monitor closely', 'count': 4},
-    {'pressure': '122/82', 'date': '24/01/2026', 'time': '08:30 AM', 'comment': 'Normal', 'count': 5},
-  ];
+  // User data
+  Map<String, dynamic>? userData;
+  String? userUuid;
+  bool isLoading = true;
 
-  // Sample Blood Sugar Data
-  List<Map<String, dynamic>> bloodSugarData = [
-    {'blood': '110 mg/dL', 'date': '28/01/2026', 'time': '10:30 AM', 'comment': 'Normal', 'count': 1},
-    {'blood': '125 mg/dL', 'date': '27/01/2026', 'time': '09:15 AM', 'comment': 'Slightly high', 'count': 2},
-    {'blood': '105 mg/dL', 'date': '26/01/2026', 'time': '02:45 PM', 'comment': 'Good', 'count': 3},
-    {'blood': '135 mg/dL', 'date': '25/01/2026', 'time': '11:00 AM', 'comment': 'High', 'count': 4},
-    {'blood': '100 mg/dL', 'date': '24/01/2026', 'time': '08:30 AM', 'comment': 'Optimal', 'count': 5},
-  ];
+  // Database data
+  List<Map<String, dynamic>> bloodPressureData = [];
+  List<Map<String, dynamic>> bloodSugarData = [];
 
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      userUuid = prefs.getString('user_uuid');
+
+      if (userUuid != null) {
+        userData = await SupabaseRepository().getUser(userUuid!);
+        if (userData != null) {
+          await _loadRecords();
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load user data: $e')),
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _loadRecords() async {
+    if (userData == null) return;
+
+    try {
+      final pressureRecords = await SupabaseRepository().getPressureRecords(userData!['id']);
+      final sugarRecords = await SupabaseRepository().getSugarRecords(userData!['id']);
+
+      setState(() {
+        bloodPressureData = pressureRecords.map((record) {
+          final dateTime = DateTime.parse(record['time']);
+          return {
+            'id': record['id'],
+            'pressure': '${record['value']?.toStringAsFixed(0) ?? 'N/A'}',
+            'date': '${dateTime.day}/${dateTime.month}/${dateTime.year}',
+            'time': '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}',
+            'comment': record['comment'] ?? '',
+            'count': pressureRecords.indexOf(record) + 1,
+          };
+        }).toList();
+
+        bloodSugarData = sugarRecords.map((record) {
+          final dateTime = DateTime.parse(record['time']);
+          return {
+            'id': record['id'],
+            'blood': '${record['value']?.toStringAsFixed(1) ?? 'N/A'} mg/dL',
+            'date': '${dateTime.day}/${dateTime.month}/${dateTime.year}',
+            'time': '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}',
+            'comment': record['comment'] ?? '',
+            'count': sugarRecords.indexOf(record) + 1,
+          };
+        }).toList();
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load records: $e')),
+      );
+    }
+  }
   // Delete function
-  void _deleteRecord(int index, bool isBloodPressure) {
+  void _deleteRecord(int index, bool isBloodPressure) async {
+    if (userData == null) return;
+
+    final record = isBloodPressure ? bloodPressureData[index] : bloodSugarData[index];
+    final recordId = record['id'];
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -48,18 +112,26 @@ class _SecondPageState extends State<SecondPage> {
               child: Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
-                setState(() {
+              onPressed: () async {
+                try {
                   if (isBloodPressure) {
-                    bloodPressureData.removeAt(index);
+                    await SupabaseRepository().deletePressure(recordId);
                   } else {
-                    bloodSugarData.removeAt(index);
+                    await SupabaseRepository().deleteSugar(recordId);
                   }
-                });
+
+                  // Reload records after deletion
+                  await _loadRecords();
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Record deleted successfully')),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to delete record: $e')),
+                  );
+                }
                 Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Record deleted successfully')),
-                );
               },
               child: Text('Delete', style: TextStyle(color: Colors.red)),
             ),
@@ -70,7 +142,9 @@ class _SecondPageState extends State<SecondPage> {
   }
 
   // Edit function for Blood Pressure
-  void _editBloodPressureRecord(int index) {
+  void _editBloodPressureRecord(int index) async {
+    if (userData == null) return;
+
     final record = bloodPressureData[index];
     TextEditingController pressureController = TextEditingController(text: record['pressure']);
     TextEditingController commentController = TextEditingController(text: record['comment']);
@@ -87,10 +161,11 @@ class _SecondPageState extends State<SecondPage> {
                 TextField(
                   controller: pressureController,
                   decoration: InputDecoration(
-                    labelText: 'Blood Pressure',
-                    hintText: 'e.g., 120/80',
+                    labelText: 'Blood Pressure Value',
+                    hintText: 'e.g., 120.5',
                     border: OutlineInputBorder(),
                   ),
+                  keyboardType: TextInputType.number,
                 ),
                 SizedBox(height: 15),
                 TextField(
@@ -114,17 +189,37 @@ class _SecondPageState extends State<SecondPage> {
               child: Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
-                setState(() {
-                  bloodPressureData[index]['pressure'] = pressureController.text;
-                  bloodPressureData[index]['comment'] = commentController.text;
-                });
+              onPressed: () async {
+                try {
+                  double? pressureValue = double.tryParse(pressureController.text);
+                  if (pressureValue == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Invalid pressure value')),
+                    );
+                    return;
+                  }
+
+                  await SupabaseRepository().updatePressure(
+                    id: record['id'],
+                    value: pressureValue,
+                    comment: commentController.text.isEmpty ? null : commentController.text,
+                  );
+
+                  // Reload records after update
+                  await _loadRecords();
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Record updated successfully')),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to update record: $e')),
+                  );
+                }
+
                 pressureController.dispose();
                 commentController.dispose();
                 Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Record updated successfully')),
-                );
               },
               child: Text('Save'),
             ),
@@ -135,9 +230,13 @@ class _SecondPageState extends State<SecondPage> {
   }
 
   // Edit function for Blood Sugar
-  void _editBloodSugarRecord(int index) {
+  void _editBloodSugarRecord(int index) async {
+    if (userData == null) return;
+
     final record = bloodSugarData[index];
-    TextEditingController bloodSugarController = TextEditingController(text: record['blood']);
+    // Extract numeric value from the display string (remove ' mg/dL')
+    final currentValue = record['blood'].replaceAll(' mg/dL', '');
+    TextEditingController bloodSugarController = TextEditingController(text: currentValue);
     TextEditingController commentController = TextEditingController(text: record['comment']);
 
     showDialog(
@@ -152,10 +251,11 @@ class _SecondPageState extends State<SecondPage> {
                 TextField(
                   controller: bloodSugarController,
                   decoration: InputDecoration(
-                    labelText: 'Blood Sugar',
-                    hintText: 'e.g., 110 mg/dL',
+                    labelText: 'Blood Sugar Value',
+                    hintText: 'e.g., 110.5',
                     border: OutlineInputBorder(),
                   ),
+                  keyboardType: TextInputType.number,
                 ),
                 SizedBox(height: 15),
                 TextField(
@@ -179,17 +279,37 @@ class _SecondPageState extends State<SecondPage> {
               child: Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
-                setState(() {
-                  bloodSugarData[index]['blood'] = bloodSugarController.text;
-                  bloodSugarData[index]['comment'] = commentController.text;
-                });
+              onPressed: () async {
+                try {
+                  double? sugarValue = double.tryParse(bloodSugarController.text);
+                  if (sugarValue == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Invalid blood sugar value')),
+                    );
+                    return;
+                  }
+
+                  await SupabaseRepository().updateSugar(
+                    id: record['id'],
+                    value: sugarValue,
+                    comment: commentController.text.isEmpty ? null : commentController.text,
+                  );
+
+                  // Reload records after update
+                  await _loadRecords();
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Record updated successfully')),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to update record: $e')),
+                  );
+                }
+
                 bloodSugarController.dispose();
                 commentController.dispose();
                 Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Record updated successfully')),
-                );
               },
               child: Text('Save'),
             ),
@@ -237,6 +357,26 @@ class _SecondPageState extends State<SecondPage> {
     final double sectionTitleFontSize = isDesktop ? 28 : (isTablet ? 24 : 22);
     final double buttonFontSize = isDesktop ? 16 : 14;
     final double tabFontSize = isDesktop ? 18 : 16;
+
+    if (isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Health Records',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              fontSize: isDesktop ? 32 : 24,
+            ),
+          ),
+          backgroundColor: Colors.teal,
+          elevation: 2,
+        ),
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(

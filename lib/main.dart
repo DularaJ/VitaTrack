@@ -277,8 +277,81 @@ class _MainPageState extends State<MainPage> {
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
-                                onPressed: () {
-                                  // Function will be added by backend developer
+                                onPressed: () async {
+                                  if (userData == null || userUuid == null) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('User data not loaded')),
+                                    );
+                                    return;
+                                  }
+
+                                  String bp = bloodPressureController.text.trim();
+                                  if (bp.isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Please enter blood pressure')),
+                                    );
+                                    return;
+                                  }
+
+                                  String dateStr = dateController.text.trim();
+                                  String timeStr = timeController.text.trim();
+                                  if (dateStr.isEmpty || timeStr.isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Please select date and time')),
+                                    );
+                                    return;
+                                  }
+
+                                  try {
+                                    // Parse blood pressure (expecting format like "120/80")
+                                    List<String> parts = bp.split('/');
+                                    double? systolic = double.tryParse(parts[0]);
+                                    if (systolic == null) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('Invalid blood pressure format')),
+                                      );
+                                      return;
+                                    }
+
+                                    // Parse date and time
+                                    List<String> dateParts = dateStr.split('/');
+                                    List<String> timeParts = timeStr.split(':');
+                                    DateTime dt = DateTime(
+                                      int.parse(dateParts[2]), // year
+                                      int.parse(dateParts[1]), // month
+                                      int.parse(dateParts[0]), // day
+                                      int.parse(timeParts[0]), // hour
+                                      int.parse(timeParts[1]), // minute
+                                    );
+                                    String timestamp = dt.toIso8601String();
+
+                                    // Save to database
+                                    await SupabaseRepository().insertPressure(
+                                      userId: userData!['id'],
+                                      time: timestamp,
+                                      comment: bp,
+                                      value: systolic,
+                                    );
+
+                                    // Clear fields
+                                    bloodPressureController.clear();
+                                    dateController.clear();
+                                    timeController.clear();
+
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Blood pressure record saved successfully!'),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                  } catch (e) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Failed to save record: $e'),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  }
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.red,
@@ -351,8 +424,80 @@ class _MainPageState extends State<MainPage> {
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
-                                onPressed: () {
-                                  // Function will be added by backend developer
+                                onPressed: () async {
+                                  if (userData == null || userUuid == null) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('User data not loaded')),
+                                    );
+                                    return;
+                                  }
+
+                                  String bs = bloodSugarController.text.trim();
+                                  if (bs.isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Please enter blood sugar level')),
+                                    );
+                                    return;
+                                  }
+
+                                  String dateStr = dateController.text.trim();
+                                  String timeStr = timeController.text.trim();
+                                  if (dateStr.isEmpty || timeStr.isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Please select date and time')),
+                                    );
+                                    return;
+                                  }
+
+                                  try {
+                                    // Parse blood sugar value
+                                    double? sugarValue = double.tryParse(bs);
+                                    if (sugarValue == null) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('Invalid blood sugar format')),
+                                      );
+                                      return;
+                                    }
+
+                                    // Parse date and time
+                                    List<String> dateParts = dateStr.split('/');
+                                    List<String> timeParts = timeStr.split(':');
+                                    DateTime dt = DateTime(
+                                      int.parse(dateParts[2]), // year
+                                      int.parse(dateParts[1]), // month
+                                      int.parse(dateParts[0]), // day
+                                      int.parse(timeParts[0]), // hour
+                                      int.parse(timeParts[1]), // minute
+                                    );
+                                    String timestamp = dt.toIso8601String();
+
+                                    // Save to database
+                                    await SupabaseRepository().insertSugar(
+                                      userId: userData!['id'],
+                                      time: timestamp,
+                                      comment: bs,
+                                      value: sugarValue,
+                                    );
+
+                                    // Clear fields
+                                    bloodSugarController.clear();
+                                    dateController.clear();
+                                    timeController.clear();
+
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Blood sugar record saved successfully!'),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                  } catch (e) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Failed to save record: $e'),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  }
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.orange,
@@ -425,8 +570,81 @@ class _MainPageState extends State<MainPage> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () {
-                            // Function will be added by backend developer
+                          onPressed: () async {
+                            if (userData == null || userUuid == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('User data not loaded')),
+                              );
+                              return;
+                            }
+
+                            String bp = bloodPressureController.text.trim();
+                            if (bp.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Please enter blood pressure')),
+                              );
+                              return;
+                            }
+
+                            String dateStr = dateController.text.trim();
+                            String timeStr = timeController.text.trim();
+                            if (dateStr.isEmpty || timeStr.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Please select date and time')),
+                              );
+                              return;
+                            }
+
+                            try {
+                              // Parse blood pressure (expecting format like "120/80")
+                              List<String> parts = bp.split('/');
+                              double? systolic = double.tryParse(parts[0]);
+                              if (systolic == null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Invalid blood pressure format')),
+                                );
+                                return;
+                              }
+
+                              // Parse date and time
+                              List<String> dateParts = dateStr.split('/');
+                              List<String> timeParts = timeStr.split(':');
+                              DateTime dt = DateTime(
+                                int.parse(dateParts[2]), // year
+                                int.parse(dateParts[1]), // month
+                                int.parse(dateParts[0]), // day
+                                int.parse(timeParts[0]), // hour
+                                int.parse(timeParts[1]), // minute
+                              );
+                              String timestamp = dt.toIso8601String();
+
+                              // Save to database
+                              await SupabaseRepository().insertPressure(
+                                userId: userData!['id'],
+                                time: timestamp,
+                                comment: bp,
+                                value: systolic,
+                              );
+
+                              // Clear fields
+                              bloodPressureController.clear();
+                              dateController.clear();
+                              timeController.clear();
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Blood pressure record saved successfully!'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Failed to save record: $e'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
@@ -492,8 +710,80 @@ class _MainPageState extends State<MainPage> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () {
-                            // Function will be added by backend developer
+                          onPressed: () async {
+                            if (userData == null || userUuid == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('User data not loaded')),
+                              );
+                              return;
+                            }
+
+                            String bs = bloodSugarController.text.trim();
+                            if (bs.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Please enter blood sugar level')),
+                              );
+                              return;
+                            }
+
+                            String dateStr = dateController.text.trim();
+                            String timeStr = timeController.text.trim();
+                            if (dateStr.isEmpty || timeStr.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Please select date and time')),
+                              );
+                              return;
+                            }
+
+                            try {
+                              // Parse blood sugar value
+                              double? sugarValue = double.tryParse(bs);
+                              if (sugarValue == null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Invalid blood sugar format')),
+                                );
+                                return;
+                              }
+
+                              // Parse date and time
+                              List<String> dateParts = dateStr.split('/');
+                              List<String> timeParts = timeStr.split(':');
+                              DateTime dt = DateTime(
+                                int.parse(dateParts[2]), // year
+                                int.parse(dateParts[1]), // month
+                                int.parse(dateParts[0]), // day
+                                int.parse(timeParts[0]), // hour
+                                int.parse(timeParts[1]), // minute
+                              );
+                              String timestamp = dt.toIso8601String();
+
+                              // Save to database
+                              await SupabaseRepository().insertSugar(
+                                userId: userData!['id'],
+                                time: timestamp,
+                                comment: bs,
+                                value: sugarValue,
+                              );
+
+                              // Clear fields
+                              bloodSugarController.clear();
+                              dateController.clear();
+                              timeController.clear();
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Blood sugar record saved successfully!'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Failed to save record: $e'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.orange,
