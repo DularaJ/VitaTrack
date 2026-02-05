@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 import 'second.dart';
 import 'profile.dart';
+import 'supabase.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  await Supabase.initialize(
+    url: 'https://pjvrtberjycotelairrz.supabase.co',
+    anonKey: 'sb_publishable_z1vq4lTS61JBzwke_JVz5Q_m79n-NrB',
+  );
+  runApp(MyApp());
+  print("supabase initialized");
 }
 
 class MyApp extends StatelessWidget {
@@ -35,6 +44,41 @@ class _MainPageState extends State<MainPage> {
 
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
+
+  String? userUuid;
+  bool isLoading = true;
+  Map<String, dynamic>? userData;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      userUuid = prefs.getString('user_uuid');
+      if (userUuid == null) {
+        userUuid = const Uuid().v4();
+        await prefs.setString('user_uuid', userUuid!);
+      }
+    } catch (e) {
+      userUuid = const Uuid().v4();
+    }
+
+    if (userUuid != null) {
+      try {
+        userData = await SupabaseRepository().getUser(userUuid!);
+      } catch (e) {
+        // Keep userData as null
+      }
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   Future<void> selectDate() async {
     final DateTime? picked = await showDatePicker(
@@ -147,14 +191,14 @@ class _MainPageState extends State<MainPage> {
                       Expanded(child: _buildInfoCard(
                         icon: Icons.person,
                         label: 'Patient Name',
-                        value: 'Anuz Nowa',
+                        value: userData?['fullname'] ?? 'Anuz Nowa',
                         labelFontSize: labelFontSize,
                       )),
                       SizedBox(width: 20),
                       Expanded(child: _buildInfoCard(
                         icon: Icons.cake,
                         label: 'Age',
-                        value: '30 years',
+                        value: '${userData?['age'] ?? '30'} years',
                         labelFontSize: labelFontSize,
                       )),
                     ],
@@ -164,14 +208,14 @@ class _MainPageState extends State<MainPage> {
                       _buildInfoCard(
                         icon: Icons.person,
                         label: 'Patient Name',
-                        value: 'Anuz Nowa',
+                        value: userData?['fullname'] ?? 'Anuz Nowa',
                         labelFontSize: labelFontSize,
                       ),
                       SizedBox(height: 15),
                       _buildInfoCard(
                         icon: Icons.cake,
                         label: 'Age',
-                        value: '30 years',
+                        value: '${userData?['age'] ?? '30'} years',
                         labelFontSize: labelFontSize,
                       ),
                     ],

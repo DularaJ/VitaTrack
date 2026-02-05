@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
+import 'supabase.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -15,7 +18,52 @@ class _ProfilePageState extends State<ProfilePage> {
   TextEditingController addressController = TextEditingController(text: '123 Health Street, Medical City');
   TextEditingController bloodTypeController = TextEditingController(text: 'O+');
 
+  String? userUuid;
+  bool isLoading = true;
   bool isEditMode = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      userUuid = prefs.getString('user_uuid');
+      if (userUuid == null) {
+        userUuid = const Uuid().v4();
+        await prefs.setString('user_uuid', userUuid!);
+      }
+    } catch (e) {
+      // Fallback: generate UUID without persistence
+      print('SharedPreferences not available, generating new UUID: $e');
+      userUuid = const Uuid().v4();
+    }
+
+    // Load user data from Supabase
+    if (userUuid != null) {
+      try {
+        final userData = await SupabaseRepository().getUser(userUuid!);
+        if (userData != null) {
+          nameController.text = userData['fullname'] ?? '';
+          ageController.text = userData['age'] ?? '';
+          emailController.text = userData['email'] ?? '';
+          phoneController.text = userData['phone'] ?? '';
+          addressController.text = userData['address'] ?? '';
+          bloodTypeController.text = userData['bloodtype'] ?? '';
+        }
+      } catch (e) {
+        // User not found or error, keep default values
+        print('Error loading user data: $e');
+      }
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +122,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   SizedBox(height: 20),
                   Text(
-                    'Anuz Nowa',
+                    nameController.text.isEmpty ? 'User' : nameController.text,
                     style: TextStyle(
                       fontSize: sectionTitleFontSize,
                       fontWeight: FontWeight.bold,
@@ -83,7 +131,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   SizedBox(height: 5),
                   Text(
-                    'Health ID: VT-2026-001',
+                    'Health ID: ${userUuid ?? 'N/A'}',
                     style: TextStyle(
                       fontSize: labelFontSize - 2,
                       color: Colors.grey,
@@ -315,16 +363,66 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: SizedBox(
                       width: isDesktop ? 300 : double.infinity,
                       child: ElevatedButton.icon(
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Profile updated successfully!'),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-                          setState(() {
-                            isEditMode = false;
-                          });
+                        onPressed: () async {
+                          if (userUuid == null) return;
+
+                          print('Saving profile for UUID: $userUuid');
+
+                          try {
+                            final existingUser = await SupabaseRepository().getUser(userUuid!);
+                            print('Existing user: $existingUser');
+
+                            if (existingUser != null) {
+                              // Update existing user
+                              print('Updating user...');
+                              await SupabaseRepository().updateUser(
+                                uuid: userUuid!,
+                                fullname: nameController.text,
+                                age: ageController.text,
+                                email: emailController.text,
+                                phone: phoneController.text,
+                                address: addressController.text,
+                                bloodtype: bloodTypeController.text,
+                              );
+                              print('User updated successfully');
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Profile updated successfully!'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            } else {
+                              // Insert new user
+                              print('Inserting new user...');
+                              await SupabaseRepository().insertUser(
+                                uuid: userUuid!,
+                                fullname: nameController.text,
+                                age: ageController.text,
+                                email: emailController.text,
+                                phone: phoneController.text,
+                                address: addressController.text,
+                                bloodtype: bloodTypeController.text,
+                              );
+                              print('User inserted successfully');
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Profile saved successfully!'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            }
+                            setState(() {
+                              isEditMode = false;
+                            });
+                          } catch (e) {
+                            print('Error saving profile: $e');
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Failed to save profile: $e'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
                         },
                         icon: Icon(Icons.save, color: Colors.white),
                         label: Text(
