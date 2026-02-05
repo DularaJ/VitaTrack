@@ -267,7 +267,7 @@ class _MainPageState extends State<MainPage> {
                             SizedBox(height: 15),
                             TextField(
                               controller: bloodPressureController,
-                              keyboardType: TextInputType.number,
+                              keyboardType: TextInputType.numberWithOptions(decimal: true),
                               decoration: InputDecoration(
                                 labelText: 'Blood Pressure (mmHg)',
                                 hintText: 'e.g., 120/80',
@@ -448,7 +448,7 @@ class _MainPageState extends State<MainPage> {
                             SizedBox(height: 15),
                             TextField(
                               controller: bloodSugarController,
-                              keyboardType: TextInputType.number,
+                              keyboardType: TextInputType.numberWithOptions(decimal: true),
                               decoration: InputDecoration(
                                 labelText: 'Blood Sugar (mg/dL)',
                                 hintText: 'e.g., 110',
@@ -628,7 +628,7 @@ class _MainPageState extends State<MainPage> {
                       SizedBox(height: 15),
                       TextField(
                         controller: bloodPressureController,
-                        keyboardType: TextInputType.number,
+                        keyboardType: TextInputType.numberWithOptions(decimal: true),
                         decoration: InputDecoration(
                           labelText: 'Blood Pressure (mmHg)',
                           hintText: 'e.g., 120/80',
@@ -802,7 +802,7 @@ class _MainPageState extends State<MainPage> {
                       SizedBox(height: 15),
                       TextField(
                         controller: bloodSugarController,
-                        keyboardType: TextInputType.number,
+                        keyboardType: TextInputType.numberWithOptions(decimal: true),
                         decoration: InputDecoration(
                           labelText: 'Blood Sugar (mg/dL)',
                           hintText: 'e.g., 110',

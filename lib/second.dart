@@ -67,7 +67,7 @@ class _SecondPageState extends State<SecondPage> {
           final dateTime = DateTime.parse(record['time']);
           return {
             'id': record['id'],
-            'pressure': '${record['value']?.toStringAsFixed(0) ?? 'N/A'}',
+            'pressure': '${record['value']?.toStringAsFixed(0) ?? 'N/A'} mmHg',
             'date': '${dateTime.day}/${dateTime.month}/${dateTime.year}',
             'time': '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}',
             'comment': record['comment'] ?? '',
@@ -146,7 +146,9 @@ class _SecondPageState extends State<SecondPage> {
     if (userData == null) return;
 
     final record = bloodPressureData[index];
-    TextEditingController pressureController = TextEditingController(text: record['pressure']);
+    // Extract numeric value from the display string (remove ' mmHg')
+    final currentValue = record['pressure'].replaceAll(' mmHg', '');
+    TextEditingController pressureController = TextEditingController(text: currentValue);
     TextEditingController commentController = TextEditingController(text: record['comment']);
 
     showDialog(
@@ -161,11 +163,11 @@ class _SecondPageState extends State<SecondPage> {
                 TextField(
                   controller: pressureController,
                   decoration: InputDecoration(
-                    labelText: 'Blood Pressure Value',
+                    labelText: 'Blood Pressure Value (mmHg)',
                     hintText: 'e.g., 120.5',
                     border: OutlineInputBorder(),
                   ),
-                  keyboardType: TextInputType.number,
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
                 ),
                 SizedBox(height: 15),
                 TextField(
@@ -255,7 +257,7 @@ class _SecondPageState extends State<SecondPage> {
                     hintText: 'e.g., 110.5',
                     border: OutlineInputBorder(),
                   ),
-                  keyboardType: TextInputType.number,
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
                 ),
                 SizedBox(height: 15),
                 TextField(
