@@ -26,6 +26,13 @@ class _SecondPageState extends State<SecondPage> {
   // Database data
   List<Map<String, dynamic>> bloodPressureData = [];
   List<Map<String, dynamic>> bloodSugarData = [];
+  
+  // Original data for filtering
+  List<Map<String, dynamic>> originalBloodPressureData = [];
+  List<Map<String, dynamic>> originalBloodSugarData = [];
+  
+  // Filter state
+  bool isFiltered = false;
 
   @override
   void initState() {
@@ -63,7 +70,7 @@ class _SecondPageState extends State<SecondPage> {
       final sugarRecords = await SupabaseRepository().getSugarRecords(userData!['id']);
 
       setState(() {
-        bloodPressureData = pressureRecords.map((record) {
+        originalBloodPressureData = pressureRecords.map((record) {
           final dateTime = DateTime.parse(record['time']);
           return {
             'id': record['id'],
@@ -75,7 +82,7 @@ class _SecondPageState extends State<SecondPage> {
           };
         }).toList();
 
-        bloodSugarData = sugarRecords.map((record) {
+        originalBloodSugarData = sugarRecords.map((record) {
           final dateTime = DateTime.parse(record['time']);
           return {
             'id': record['id'],
@@ -86,6 +93,11 @@ class _SecondPageState extends State<SecondPage> {
             'count': sugarRecords.indexOf(record) + 1,
           };
         }).toList();
+
+        // Initially show all records
+        bloodPressureData = List.from(originalBloodPressureData);
+        bloodSugarData = List.from(originalBloodSugarData);
+        isFiltered = false;
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -93,6 +105,86 @@ class _SecondPageState extends State<SecondPage> {
       );
     }
   }
+
+  // Filter records by date range
+  void _filterRecords() {
+    if (startDate == null && endDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please select at least one date to filter')),
+      );
+      return;
+    }
+
+    setState(() {
+      // Filter blood pressure records
+      bloodPressureData = originalBloodPressureData.where((record) {
+        final recordDate = _parseDateString(record['date']);
+        if (recordDate == null) return false;
+
+        bool matchesStart = startDate == null || !recordDate.isBefore(DateTime(startDate!.year, startDate!.month, startDate!.day));
+        bool matchesEnd = endDate == null || !recordDate.isAfter(DateTime(endDate!.year, endDate!.month, endDate!.day));
+
+        return matchesStart && matchesEnd;
+      }).toList();
+
+      // Filter blood sugar records
+      bloodSugarData = originalBloodSugarData.where((record) {
+        final recordDate = _parseDateString(record['date']);
+        if (recordDate == null) return false;
+
+        bool matchesStart = startDate == null || !recordDate.isBefore(DateTime(startDate!.year, startDate!.month, startDate!.day));
+        bool matchesEnd = endDate == null || !recordDate.isAfter(DateTime(endDate!.year, endDate!.month, endDate!.day));
+
+        return matchesStart && matchesEnd;
+      }).toList();
+
+      // Update counts after filtering
+      for (int i = 0; i < bloodPressureData.length; i++) {
+        bloodPressureData[i]['count'] = i + 1;
+      }
+      for (int i = 0; i < bloodSugarData.length; i++) {
+        bloodSugarData[i]['count'] = i + 1;
+      }
+
+      isFiltered = true;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Filtered records: ${bloodPressureData.length} pressure, ${bloodSugarData.length} sugar records found'),
+        backgroundColor: Colors.green,
+      ),
+    );
+  }
+
+  // Clear filter and show all records
+  void _clearFilter() {
+    setState(() {
+      bloodPressureData = List.from(originalBloodPressureData);
+      bloodSugarData = List.from(originalBloodSugarData);
+      isFiltered = false;
+      startDate = null;
+      endDate = null;
+      startDateController.clear();
+      endDateController.clear();
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Filter cleared - showing all records')),
+    );
+  }
+
+  // Helper method to parse date string (DD/MM/YYYY) to DateTime
+  DateTime? _parseDateString(String dateStr) {
+    try {
+      final parts = dateStr.split('/');
+      if (parts.length != 3) return null;
+      return DateTime(int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
+    } catch (e) {
+      return null;
+    }
+  }
+
   // Delete function
   void _deleteRecord(int index, bool isBloodPressure) async {
     if (userData == null) return;
@@ -562,14 +654,7 @@ class _SecondPageState extends State<SecondPage> {
                       SizedBox(width: 15),
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: () {
-                            // Filter logic here
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Filtering from ${startDateController.text} to ${endDateController.text}'),
-                              ),
-                            );
-                          },
+                          onPressed: _filterRecords,
                           icon: Icon(Icons.filter_list, color: Colors.white),
                           label: Text(
                             'Filter',
@@ -577,6 +662,24 @@ class _SecondPageState extends State<SecondPage> {
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.teal,
+                            padding: EdgeInsets.symmetric(vertical: 20),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 15),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: isFiltered ? _clearFilter : null,
+                          icon: Icon(Icons.clear, color: Colors.white),
+                          label: Text(
+                            'Clear Filter',
+                            style: TextStyle(color: Colors.white, fontSize: buttonFontSize),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: isFiltered ? Colors.grey : Colors.grey[400],
                             padding: EdgeInsets.symmetric(vertical: 20),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
@@ -629,14 +732,7 @@ class _SecondPageState extends State<SecondPage> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
-                          onPressed: () {
-                            // Filter logic here
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Filtering from ${startDateController.text} to ${endDateController.text}'),
-                              ),
-                            );
-                          },
+                          onPressed: _filterRecords,
                           icon: Icon(Icons.filter_list, color: Colors.white),
                           label: Text(
                             'Filter Records',
@@ -644,6 +740,25 @@ class _SecondPageState extends State<SecondPage> {
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.teal,
+                            padding: EdgeInsets.symmetric(vertical: 15),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: isFiltered ? _clearFilter : null,
+                          icon: Icon(Icons.clear, color: Colors.white),
+                          label: Text(
+                            'Clear Filter',
+                            style: TextStyle(color: Colors.white, fontSize: buttonFontSize),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: isFiltered ? Colors.grey : Colors.grey[400],
                             padding: EdgeInsets.symmetric(vertical: 15),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
