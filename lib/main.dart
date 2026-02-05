@@ -5,6 +5,8 @@ import 'package:uuid/uuid.dart';
 import 'second.dart';
 import 'profile.dart';
 import 'supabase.dart';
+import 'signin.dart';
+import 'signup.dart';
 
 Future<void> main() async {
   await Supabase.initialize(
@@ -22,7 +24,60 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MainPage(),
+      home: const AuthWrapper(),
+    );
+  }
+}
+
+class AuthWrapper extends StatefulWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<AuthWrapper> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAuthStatus();
+    });
+  }
+
+  Future<void> _checkAuthStatus() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userUuid = prefs.getString('user_uuid');
+      
+      if (!mounted) return;
+      
+      if (userUuid != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MainPage()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const SigninPage()),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const SigninPage()),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(),
+      ),
     );
   }
 }

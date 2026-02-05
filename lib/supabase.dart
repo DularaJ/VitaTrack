@@ -1,5 +1,6 @@
 
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SupabaseRepository {
   static final SupabaseRepository _instance = SupabaseRepository._internal();
@@ -9,9 +10,7 @@ class SupabaseRepository {
 
   SupabaseRepository._internal();
 
-  // User-related methods
-
-  // Insert a new user
+  // Insert user into user table (for custom auth)
   Future<void> insertUser({
     required String uuid,
     String? fullname,
@@ -32,9 +31,59 @@ class SupabaseRepository {
     });
   }
 
+  // User-related methods
+
+  // Insert a new user (signup) with UUID
+  Future<void> signUp({
+    required String uuid,
+    required String email,
+    required String password,
+    String? fullname,
+    String? age,
+  }) async {
+    // Check if email already exists
+    final existing = await _client.from('user').select().eq('email', email);
+    if (existing.isNotEmpty) {
+      throw Exception('Email already registered');
+    }
+
+    // Insert new user with UUID and plain password
+    await _client.from('user').insert({
+      'uuid': uuid,
+      'email': email,
+      'password': password,
+      'fullname': fullname,
+      'age': age,
+    });
+  }
+
+  // Sign in with email and password
+  Future<Map<String, dynamic>> signIn({
+    required String email,
+    required String password,
+  }) async {
+    final response = await _client
+        .from('user')
+        .select()
+        .eq('email', email)
+        .eq('password', password);
+
+    if (response.isEmpty) {
+      throw Exception('Invalid email or password');
+    }
+
+    return response[0];
+  }
+
   // Fetch user by UUID
   Future<Map<String, dynamic>?> getUser(String uuid) async {
     final response = await _client.from('user').select().eq('uuid', uuid);
+    return response.isNotEmpty ? response[0] : null;
+  }
+
+  // Fetch user by email
+  Future<Map<String, dynamic>?> getUserByEmail(String email) async {
+    final response = await _client.from('user').select().eq('email', email);
     return response.isNotEmpty ? response[0] : null;
   }
 
@@ -47,6 +96,7 @@ class SupabaseRepository {
     String? phone,
     String? address,
     String? bloodtype,
+    String? password,
   }) async {
     final updates = <String, dynamic>{};
     if (fullname != null) updates['fullname'] = fullname;
@@ -55,6 +105,7 @@ class SupabaseRepository {
     if (phone != null) updates['phone'] = phone;
     if (address != null) updates['address'] = address;
     if (bloodtype != null) updates['bloodtype'] = bloodtype;
+    if (password != null) updates['password'] = password;
 
     await _client.from('user').update(updates).eq('uuid', uuid);
   }
@@ -203,5 +254,12 @@ class SupabaseRepository {
   // Delete sugar record
   Future<void> deleteSugar(int id) async {
     await _client.from('sugar').delete().eq('id', id);
+  }
+
+  // Sign out - clear session from shared preferences
+  Future<void> signOut() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('user_uuid');
+    await prefs.remove('user_id');
   }
 }
