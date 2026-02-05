@@ -209,15 +209,20 @@ class SupabaseRepository {
     
     // Filter by date in Dart if needed
     if (startDate != null || endDate != null) {
+      // Normalize dates to midnight for comparison
+      final normalizedStart = startDate != null ? DateTime(startDate.year, startDate.month, startDate.day) : null;
+      final normalizedEnd = endDate != null ? DateTime(endDate.year, endDate.month, endDate.day) : null;
+      
       return response.where((record) {
         final timeStr = record['time'];
         if (timeStr == null) return false;
         final recordDate = DateTime.parse(timeStr);
+        final normalizedRecord = DateTime(recordDate.year, recordDate.month, recordDate.day);
         
-        if (startDate != null && recordDate.isBefore(startDate)) {
+        if (normalizedStart != null && normalizedRecord.isBefore(normalizedStart)) {
           return false;
         }
-        if (endDate != null && recordDate.isAfter(endDate)) {
+        if (normalizedEnd != null && normalizedRecord.isAfter(normalizedEnd)) {
           return false;
         }
         return true;
@@ -240,15 +245,20 @@ class SupabaseRepository {
     
     // Filter by date in Dart if needed
     if (startDate != null || endDate != null) {
+      // Normalize dates to midnight for comparison
+      final normalizedStart = startDate != null ? DateTime(startDate.year, startDate.month, startDate.day) : null;
+      final normalizedEnd = endDate != null ? DateTime(endDate.year, endDate.month, endDate.day) : null;
+      
       return response.where((record) {
         final timeStr = record['time'];
         if (timeStr == null) return false;
         final recordDate = DateTime.parse(timeStr);
+        final normalizedRecord = DateTime(recordDate.year, recordDate.month, recordDate.day);
         
-        if (startDate != null && recordDate.isBefore(startDate)) {
+        if (normalizedStart != null && normalizedRecord.isBefore(normalizedStart)) {
           return false;
         }
-        if (endDate != null && recordDate.isAfter(endDate)) {
+        if (normalizedEnd != null && normalizedRecord.isAfter(normalizedEnd)) {
           return false;
         }
         return true;
