@@ -196,23 +196,65 @@ class SupabaseRepository {
     });
   }
 
-  // Fetch pressure records for a user
-  Future<List<Map<String, dynamic>>> getPressureRecords(int userId) async {
+  // Fetch pressure records for a user with optional date filter
+  Future<List<Map<String, dynamic>>> getPressureRecords(int userId, {
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
     final response = await _client
         .from('pressure')
         .select()
         .eq('user', userId)
         .order('time', ascending: false);
+    
+    // Filter by date in Dart if needed
+    if (startDate != null || endDate != null) {
+      return response.where((record) {
+        final timeStr = record['time'];
+        if (timeStr == null) return false;
+        final recordDate = DateTime.parse(timeStr);
+        
+        if (startDate != null && recordDate.isBefore(startDate)) {
+          return false;
+        }
+        if (endDate != null && recordDate.isAfter(endDate)) {
+          return false;
+        }
+        return true;
+      }).toList();
+    }
+    
     return response;
   }
 
-  // Fetch sugar records for a user
-  Future<List<Map<String, dynamic>>> getSugarRecords(int userId) async {
+  // Fetch sugar records for a user with optional date filter
+  Future<List<Map<String, dynamic>>> getSugarRecords(int userId, {
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
     final response = await _client
         .from('sugar')
         .select()
         .eq('user', userId)
         .order('time', ascending: false);
+    
+    // Filter by date in Dart if needed
+    if (startDate != null || endDate != null) {
+      return response.where((record) {
+        final timeStr = record['time'];
+        if (timeStr == null) return false;
+        final recordDate = DateTime.parse(timeStr);
+        
+        if (startDate != null && recordDate.isBefore(startDate)) {
+          return false;
+        }
+        if (endDate != null && recordDate.isAfter(endDate)) {
+          return false;
+        }
+        return true;
+      }).toList();
+    }
+    
     return response;
   }
 

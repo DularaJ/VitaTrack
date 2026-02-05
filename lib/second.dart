@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'supabase.dart';
+import 'pressure_chart.dart';
+import 'sugar_chart.dart';
 
 class SecondPage extends StatefulWidget {
   const SecondPage({super.key});
@@ -533,7 +535,10 @@ class _SecondPageState extends State<SecondPage> {
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: () {
-                            // Function will be added by backend developer
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => PressureChartPage()),
+                            );
                           },
                           icon: Icon(Icons.show_chart, color: Colors.white),
                           label: Text(
@@ -554,7 +559,10 @@ class _SecondPageState extends State<SecondPage> {
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: () {
-                            // Function will be added by backend developer
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => SugarChartPage()),
+                            );
                           },
                           icon: Icon(Icons.analytics, color: Colors.white),
                           label: Text(
@@ -579,7 +587,10 @@ class _SecondPageState extends State<SecondPage> {
                         width: double.infinity,
                         child: ElevatedButton.icon(
                           onPressed: () {
-                            // Function will be added by backend developer
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => PressureChartPage()),
+                            );
                           },
                           icon: Icon(Icons.show_chart, color: Colors.white),
                           label: Text(
@@ -600,7 +611,10 @@ class _SecondPageState extends State<SecondPage> {
                         width: double.infinity,
                         child: ElevatedButton.icon(
                           onPressed: () {
-                            // Function will be added by backend developer
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => SugarChartPage()),
+                            );
                           },
                           icon: Icon(Icons.analytics, color: Colors.white),
                           label: Text(
@@ -704,7 +718,7 @@ class _SecondPageState extends State<SecondPage> {
                             style: TextStyle(color: Colors.white, fontSize: buttonFontSize),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: isFiltered ? Colors.grey : Colors.grey[400],
+                            backgroundColor: isFiltered ? Colors.red : Colors.grey,
                             padding: EdgeInsets.symmetric(vertical: 20),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
@@ -760,12 +774,12 @@ class _SecondPageState extends State<SecondPage> {
                           onPressed: _filterRecords,
                           icon: Icon(Icons.filter_list, color: Colors.white),
                           label: Text(
-                            'Filter Records',
+                            'Filter',
                             style: TextStyle(color: Colors.white, fontSize: buttonFontSize),
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.teal,
-                            padding: EdgeInsets.symmetric(vertical: 15),
+                            padding: EdgeInsets.symmetric(vertical: 20),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -783,8 +797,8 @@ class _SecondPageState extends State<SecondPage> {
                             style: TextStyle(color: Colors.white, fontSize: buttonFontSize),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: isFiltered ? Colors.grey : Colors.grey[400],
-                            padding: EdgeInsets.symmetric(vertical: 15),
+                            backgroundColor: isFiltered ? Colors.red : Colors.grey,
+                            padding: EdgeInsets.symmetric(vertical: 20),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -794,435 +808,210 @@ class _SecondPageState extends State<SecondPage> {
                     ],
                   ),
             SizedBox(height: 30),
-            isDesktop
-                ? Row(
-                    children: [
-                      Expanded(
-                        child: _buildTab(
-                          isSelected: selectedTab == 0,
-                          icon: Icons.favorite,
-                          label: 'Blood Pressure',
-                          onTap: () => setState(() => selectedTab = 0),
-                          fontSize: tabFontSize,
-                          backgroundColor: Colors.red,
+            
+            // Tabs for Blood Pressure and Blood Sugar
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedTab = 0;
+                        });
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 15),
+                        decoration: BoxDecoration(
+                          color: selectedTab == 0 ? Colors.red : Colors.transparent,
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                      ),
-                      SizedBox(width: 15),
-                      Expanded(
-                        child: _buildTab(
-                          isSelected: selectedTab == 1,
-                          icon: Icons.opacity,
-                          label: 'Blood Sugar',
-                          onTap: () => setState(() => selectedTab = 1),
-                          fontSize: tabFontSize,
-                          backgroundColor: Colors.orange,
-                        ),
-                      ),
-                    ],
-                  )
-                : Column(
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildTab(
-                              isSelected: selectedTab == 0,
-                              icon: Icons.favorite,
-                              label: 'Blood Pressure',
-                              onTap: () => setState(() => selectedTab = 0),
-                              fontSize: tabFontSize,
-                              backgroundColor: Colors.red,
-                            ),
+                        child: Text(
+                          'Blood Pressure',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: selectedTab == 0 ? Colors.white : Colors.red,
+                            fontSize: tabFontSize,
+                            fontWeight: FontWeight.bold,
                           ),
-                          SizedBox(width: 15),
-                          Expanded(
-                            child: _buildTab(
-                              isSelected: selectedTab == 1,
-                              icon: Icons.opacity,
-                              label: 'Blood Sugar',
-                              onTap: () => setState(() => selectedTab = 1),
-                              fontSize: tabFontSize,
-                              backgroundColor: Colors.orange,
-                            ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedTab = 1;
+                        });
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 15),
+                        decoration: BoxDecoration(
+                          color: selectedTab == 1 ? Colors.orange : Colors.transparent,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          'Blood Sugar',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: selectedTab == 1 ? Colors.white : Colors.orange,
+                            fontSize: tabFontSize,
+                            fontWeight: FontWeight.bold,
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
-            SizedBox(height: 30),
-
-            // Data Tables Section
-            selectedTab == 0
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Blood Pressure Records',
-                        style: TextStyle(
-                          fontSize: sectionTitleFontSize,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red,
                         ),
                       ),
-                      SizedBox(height: 15),
-                      _buildBloodPressureTable(isDesktop),
-                    ],
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Blood Sugar Records',
-                        style: TextStyle(
-                          fontSize: sectionTitleFontSize,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 20),
+            
+            // Blood Pressure Tab Content
+            if (selectedTab == 0) ...[
+              bloodPressureData.isEmpty
+                  ? Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(30),
+                        child: Text(
+                          'No Blood Pressure records found',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
-                      SizedBox(height: 15),
-                      _buildBloodSugarTable(isDesktop),
-                    ],
-                  ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBloodPressureTable(bool isDesktop) {
-    return Container(
-      width: double.infinity,
-      child: isDesktop
-          ? DataTable(
-              columnSpacing: 20,
-              columns: const [
-                DataColumn(label: Text('Count', style: TextStyle(fontWeight: FontWeight.bold))),
-                DataColumn(label: Text('Pressure', style: TextStyle(fontWeight: FontWeight.bold))),
-                DataColumn(label: Text('Date', style: TextStyle(fontWeight: FontWeight.bold))),
-                DataColumn(label: Text('Time', style: TextStyle(fontWeight: FontWeight.bold))),
-                DataColumn(label: Text('Comment', style: TextStyle(fontWeight: FontWeight.bold))),
-                DataColumn(label: Text('Actions', style: TextStyle(fontWeight: FontWeight.bold))),
-              ],
-              rows: bloodPressureData
-                  .asMap()
-                  .entries
-                  .map(
-                    (entry) {
-                      int index = entry.key;
-                      var record = entry.value;
-                      return DataRow(
-                        cells: [
-                          DataCell(Text(record['count'].toString())),
-                          DataCell(
-                            Container(
-                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.red[50],
-                                borderRadius: BorderRadius.circular(5),
-                                border: Border.all(color: Colors.red),
+                    )
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: bloodPressureData.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                          elevation: 2,
+                          margin: EdgeInsets.only(bottom: 15),
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: Colors.red[100],
+                              child: Icon(Icons.favorite, color: Colors.red),
+                            ),
+                            title: Text(
+                              bloodPressureData[index]['pressure'],
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.red,
                               ),
-                              child: Text(
-                                record['pressure'],
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.red,
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Date: ${bloodPressureData[index]['date']} | Time: ${bloodPressureData[index]['time']}',
+                                  style: TextStyle(fontSize: 12),
                                 ),
-                              ),
+                                if (bloodPressureData[index]['comment'].isNotEmpty)
+                                  Text(
+                                    'Comment: ${bloodPressureData[index]['comment']}',
+                                    style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+                                  ),
+                              ],
                             ),
-                          ),
-                          DataCell(Text(record['date'])),
-                          DataCell(Text(record['time'])),
-                          DataCell(Text(record['comment'])),
-                          DataCell(
-                            Row(
+                            trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 IconButton(
-                                  icon: Icon(Icons.edit, color: Colors.blue, size: 30),
+                                  icon: Icon(Icons.edit, color: Colors.blue),
                                   onPressed: () => _editBloodPressureRecord(index),
-                                  tooltip: 'Edit',
                                 ),
                                 IconButton(
-                                  icon: Icon(Icons.delete, color: Colors.red, size: 30),
+                                  icon: Icon(Icons.delete, color: Colors.red),
                                   onPressed: () => _deleteRecord(index, true),
-                                  tooltip: 'Delete',
                                 ),
                               ],
                             ),
                           ),
-                        ],
-                      );
-                    },
-                  )
-                  .toList(),
-            )
-          : Column(
-              children: bloodPressureData
-                  .asMap()
-                  .entries
-                  .map(
-                    (entry) {
-                      int index = entry.key;
-                      var record = entry.value;
-                      return _buildTableCard(
-                        count: record['count'],
-                        mainValue: record['pressure'],
-                        date: record['date'],
-                        time: record['time'],
-                        comment: record['comment'],
-                        color: Colors.red,
-                        onEdit: () => _editBloodPressureRecord(index),
-                        onDelete: () => _deleteRecord(index, true),
-                      );
-                    },
-                  )
-                  .toList(),
-            ),
-    );
-  }
-
-  Widget _buildBloodSugarTable(bool isDesktop) {
-    return Container(
-      width: double.infinity,
-      child: isDesktop
-          ? DataTable(
-              columnSpacing: 20,
-              columns: const [
-                DataColumn(label: Text('Count', style: TextStyle(fontWeight: FontWeight.bold))),
-                DataColumn(label: Text('Blood Sugar', style: TextStyle(fontWeight: FontWeight.bold))),
-                DataColumn(label: Text('Date', style: TextStyle(fontWeight: FontWeight.bold))),
-                DataColumn(label: Text('Time', style: TextStyle(fontWeight: FontWeight.bold))),
-                DataColumn(label: Text('Comment', style: TextStyle(fontWeight: FontWeight.bold))),
-                DataColumn(label: Text('Actions', style: TextStyle(fontWeight: FontWeight.bold))),
-              ],
-              rows: bloodSugarData
-                  .asMap()
-                  .entries
-                  .map(
-                    (entry) {
-                      int index = entry.key;
-                      var record = entry.value;
-                      return DataRow(
-                        cells: [
-                          DataCell(Text(record['count'].toString())),
-                          DataCell(
-                            Container(
-                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.orange[50],
-                                borderRadius: BorderRadius.circular(5),
-                                border: Border.all(color: Colors.orange),
-                              ),
-                              child: Text(
-                                record['blood'],
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.orange,
-                                ),
+                        );
+                      },
+                    ),
+            ],
+            
+            // Blood Sugar Tab Content
+            if (selectedTab == 1) ...[
+              bloodSugarData.isEmpty
+                  ? Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(30),
+                        child: Text(
+                          'No Blood Sugar records found',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: bloodSugarData.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                          elevation: 2,
+                          margin: EdgeInsets.only(bottom: 15),
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: Colors.orange[100],
+                              child: Icon(Icons.opacity, color: Colors.orange),
+                            ),
+                            title: Text(
+                              bloodSugarData[index]['blood'],
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.orange,
                               ),
                             ),
-                          ),
-                          DataCell(Text(record['date'])),
-                          DataCell(Text(record['time'])),
-                          DataCell(Text(record['comment'])),
-                          DataCell(
-                            Row(
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Date: ${bloodSugarData[index]['date']} | Time: ${bloodSugarData[index]['time']}',
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                                if (bloodSugarData[index]['comment'].isNotEmpty)
+                                  Text(
+                                    'Comment: ${bloodSugarData[index]['comment']}',
+                                    style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+                                  ),
+                              ],
+                            ),
+                            trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 IconButton(
-                                  icon: Icon(Icons.edit, color: Colors.blue, size: 30),
+                                  icon: Icon(Icons.edit, color: Colors.blue),
                                   onPressed: () => _editBloodSugarRecord(index),
-                                  tooltip: 'Edit',
                                 ),
                                 IconButton(
-                                  icon: Icon(Icons.delete, color: Colors.red, size: 30),
+                                  icon: Icon(Icons.delete, color: Colors.red),
                                   onPressed: () => _deleteRecord(index, false),
-                                  tooltip: 'Delete',
                                 ),
                               ],
                             ),
                           ),
-                        ],
-                      );
-                    },
-                  )
-                  .toList(),
-            )
-          : Column(
-              children: bloodSugarData
-                  .asMap()
-                  .entries
-                  .map(
-                    (entry) {
-                      int index = entry.key;
-                      var record = entry.value;
-                      return _buildTableCard(
-                        count: record['count'],
-                        mainValue: record['blood'],
-                        date: record['date'],
-                        time: record['time'],
-                        comment: record['comment'],
-                        color: Colors.orange,
-                        onEdit: () => _editBloodSugarRecord(index),
-                        onDelete: () => _deleteRecord(index, false),
-                      );
-                    },
-                  )
-                  .toList(),
-            ),
-    );
-  }
-
-  Widget _buildTableCard({
-    required int count,
-    required String mainValue,
-    required String date,
-    required String time,
-    required String comment,
-    required Color color,
-    required VoidCallback onEdit,
-    required VoidCallback onDelete,
-  }) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 12),
-      padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Record #$count',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: Text(
-                  mainValue,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
+                        );
+                      },
+                    ),
             ],
-          ),
-          SizedBox(height: 10),
-          Row(
-            children: [
-              Icon(Icons.calendar_today, size: 16, color: color),
-              SizedBox(width: 5),
-              Text(date, style: TextStyle(fontSize: 12)),
-              SizedBox(width: 20),
-              Icon(Icons.access_time, size: 16, color: color),
-              SizedBox(width: 5),
-              Text(time, style: TextStyle(fontSize: 12)),
-            ],
-          ),
-          SizedBox(height: 8),
-          Row(
-            children: [
-              Icon(Icons.note, size: 16, color: color),
-              SizedBox(width: 5),
-              Expanded(
-                child: Text(
-                  'Comment: $comment',
-                  style: TextStyle(fontSize: 12),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              ElevatedButton.icon(
-                onPressed: onEdit,
-                icon: Icon(Icons.edit, size: 16),
-                label: Text('Edit'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  minimumSize: Size(0, 0),
-                ),
-              ),
-              SizedBox(width: 8),
-              ElevatedButton.icon(
-                onPressed: onDelete,
-                icon: Icon(Icons.delete, size: 16),
-                label: Text('Delete'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  minimumSize: Size(0, 0),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTab({
-    required bool isSelected,
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-    required double fontSize,
-    required Color backgroundColor,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 15),
-        decoration: BoxDecoration(
-          color: isSelected ? backgroundColor : Colors.grey[200],
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? Colors.white : Colors.grey,
-            ),
-            SizedBox(width: 10),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: fontSize,
-                color: isSelected ? Colors.white : Colors.grey,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
           ],
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    startDateController.dispose();
-    endDateController.dispose();
-    super.dispose();
   }
 }

@@ -7,6 +7,8 @@ import 'profile.dart';
 import 'supabase.dart';
 import 'signin.dart';
 import 'signup.dart';
+import 'pressure_chart.dart';
+import 'sugar_chart.dart';
 
 Future<void> main() async {
   await Supabase.initialize(

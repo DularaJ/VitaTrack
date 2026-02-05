@@ -3,6 +3,7 @@ import 'signin.dart';
 import 'main.dart';
 import 'supabase.dart';
 import 'package:uuid/uuid.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -56,6 +57,16 @@ class _SignupPageState extends State<SignupPage> {
         fullname: fullname,
         age: age,
       );
+
+      // Fetch the user to get the auto-generated id
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('user_uuid', uuid);
+      
+      // Get user data to save user_id
+      final userData = await SupabaseRepository().getUser(uuid);
+      if (userData != null) {
+        await prefs.setInt('user_id', userData['id']);
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

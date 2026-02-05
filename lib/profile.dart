@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'supabase.dart';
+import 'signin.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -63,6 +64,23 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       isLoading = false;
     });
+  }
+
+  Future<void> _logout() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('user_uuid');
+      await prefs.remove('user_id');
+    } catch (e) {
+      print('Error clearing preferences: $e');
+    }
+    
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const SigninPage()),
+      );
+    }
   }
 
   @override
@@ -466,7 +484,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           TextButton(
                             onPressed: () {
                               Navigator.pop(context);
-                              // Add logout logic here
+                              _logout();
                             },
                             child: Text('Logout', style: TextStyle(color: Colors.red)),
                           ),
