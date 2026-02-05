@@ -388,9 +388,80 @@ class _SugarChartPageState extends State<SugarChartPage> {
                               )
                             : LineChart(
                                 LineChartData(
+                                  minX: 0,
+                                  maxX: chartSpots.isNotEmpty ? (chartSpots.length - 1).toDouble() : 0,
+                                  gridData: FlGridData(
+                                    show: true,
+                                    drawVerticalLine: true,
+                                    horizontalInterval: 20,
+                                    verticalInterval: 1,
+                                  ),
+                                  titlesData: FlTitlesData(
+                                    show: true,
+                                    rightTitles: const AxisTitles(
+                                      sideTitles: SideTitles(showTitles: false),
+                                    ),
+                                    topTitles: const AxisTitles(
+                                      sideTitles: SideTitles(showTitles: false),
+                                    ),
+                                    bottomTitles: AxisTitles(
+                                      sideTitles: SideTitles(
+                                        showTitles: true,
+                                        interval: 1,
+                                        getTitlesWidget: (value, meta) {
+                                          final index = value.toInt();
+                                          if (index >= 0 && index < records.length) {
+                                            final time = records[index]['time'];
+                                            if (time != null) {
+                                              final dateTime = DateTime.parse(time);
+                                              return Text(
+                                                '${dateTime.day}/${dateTime.month}',
+                                                style: const TextStyle(fontSize: 10, color: Colors.grey),
+                                              );
+                                            }
+                                          }
+                                          return const Text('', style: TextStyle(fontSize: 10));
+                                        },
+                                      ),
+                                    ),
+                                    leftTitles: AxisTitles(
+                                      sideTitles: SideTitles(
+                                        showTitles: true,
+                                        interval: 20,
+                                        getTitlesWidget: (value, meta) {
+                                          return Text(
+                                            '${value.toInt()}',
+                                            style: const TextStyle(fontSize: 10, color: Colors.grey),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  borderData: FlBorderData(
+                                    show: true,
+                                    border: Border.all(color: Colors.grey[300]!),
+                                  ),
                                   lineBarsData: [
                                     LineChartBarData(
                                       spots: chartSpots,
+                                      isCurved: false,
+                                      color: Colors.orange,
+                                      barWidth: 2,
+                                      dotData: FlDotData(
+                                        show: true,
+                                        getDotPainter: (spot, percent, barData, index) {
+                                          return FlDotCirclePainter(
+                                            radius: 4,
+                                            color: Colors.orange,
+                                            strokeColor: Colors.white,
+                                            strokeWidth: 2,
+                                          );
+                                        },
+                                      ),
+                                      belowBarData: BarAreaData(
+                                        show: true,
+                                        color: Colors.orange.withOpacity(0.1),
+                                      ),
                                     ),
                                   ],
                                 ),
