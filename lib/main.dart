@@ -342,6 +342,22 @@ class _MainPageState extends State<MainPage> {
                                       int.parse(timeParts[0]), // hour
                                       int.parse(timeParts[1]), // minute
                                     );
+
+                                    // Validate that date is not in the future
+                                    DateTime now = DateTime.now();
+                                    DateTime today = DateTime(now.year, now.month, now.day);
+                                    DateTime selectedDate = DateTime(dt.year, dt.month, dt.day);
+                                    
+                                    if (selectedDate.isAfter(today)) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text('Cannot enter records for future dates. Please select today or a past date.'),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                      return;
+                                    }
+
                                     String timestamp = dt.toIso8601String();
 
                                     // Save to database
@@ -506,6 +522,22 @@ class _MainPageState extends State<MainPage> {
                                       int.parse(timeParts[0]), // hour
                                       int.parse(timeParts[1]), // minute
                                     );
+
+                                    // Validate that date is not in the future
+                                    DateTime now = DateTime.now();
+                                    DateTime today = DateTime(now.year, now.month, now.day);
+                                    DateTime selectedDate = DateTime(dt.year, dt.month, dt.day);
+                                    
+                                    if (selectedDate.isAfter(today)) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text('Cannot enter records for future dates. Please select today or a past date.'),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                      return;
+                                    }
+
                                     String timestamp = dt.toIso8601String();
 
                                     // Save to database
@@ -671,6 +703,22 @@ class _MainPageState extends State<MainPage> {
                                 int.parse(timeParts[0]), // hour
                                 int.parse(timeParts[1]), // minute
                               );
+
+                              // Validate that date is not in the future
+                              DateTime now = DateTime.now();
+                              DateTime today = DateTime(now.year, now.month, now.day);
+                              DateTime selectedDate = DateTime(dt.year, dt.month, dt.day);
+                              
+                              if (selectedDate.isAfter(today)) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Cannot enter records for future dates. Please select today or a past date.'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                                return;
+                              }
+
                               String timestamp = dt.toIso8601String();
 
                               // Save to database
@@ -828,6 +876,22 @@ class _MainPageState extends State<MainPage> {
                                 int.parse(timeParts[0]), // hour
                                 int.parse(timeParts[1]), // minute
                               );
+
+                              // Validate that date is not in the future
+                              DateTime now = DateTime.now();
+                              DateTime today = DateTime(now.year, now.month, now.day);
+                              DateTime selectedDate = DateTime(dt.year, dt.month, dt.day);
+                              
+                              if (selectedDate.isAfter(today)) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Cannot enter records for future dates. Please select today or a past date.'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                                return;
+                              }
+
                               String timestamp = dt.toIso8601String();
 
                               // Save to database
