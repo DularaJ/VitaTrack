@@ -173,6 +173,17 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
+  void _resetDateTimeToCurrent() {
+    setState(() {
+      selectedDate = DateTime.now();
+      selectedTime = TimeOfDay.now();
+      DateTime now = DateTime.now();
+      TimeOfDay currentTime = TimeOfDay.now();
+      dateController.text = "${now.day}/${now.month}/${now.year}";
+      timeController.text = "${currentTime.hour}:${currentTime.minute.toString().padLeft(2, '0')}";
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
@@ -431,11 +442,10 @@ class _MainPageState extends State<MainPage> {
                                       value: systolic,
                                     );
 
-                                    // Clear fields
+                                    // Reset fields and date/time to current
                                     bloodPressureController.clear();
                                     bloodPressureCommentController.clear();
-                                    dateController.clear();
-                                    timeController.clear();
+                                    _resetDateTimeToCurrent();
 
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
@@ -611,11 +621,10 @@ class _MainPageState extends State<MainPage> {
                                       value: sugarValue,
                                     );
 
-                                    // Clear fields
+                                    // Reset fields and date/time to current
                                     bloodSugarController.clear();
                                     bloodSugarCommentController.clear();
-                                    dateController.clear();
-                                    timeController.clear();
+                                    _resetDateTimeToCurrent();
 
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
@@ -792,11 +801,10 @@ class _MainPageState extends State<MainPage> {
                                 value: systolic,
                               );
 
-                              // Clear fields
+                              // Reset fields and date/time to current
                               bloodPressureController.clear();
                               bloodPressureCommentController.clear();
-                              dateController.clear();
-                              timeController.clear();
+                              _resetDateTimeToCurrent();
 
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
@@ -965,11 +973,10 @@ class _MainPageState extends State<MainPage> {
                                 value: sugarValue,
                               );
 
-                              // Clear fields
+                              // Reset fields and date/time to current
                               bloodSugarController.clear();
                               bloodSugarCommentController.clear();
-                              dateController.clear();
-                              timeController.clear();
+                              _resetDateTimeToCurrent();
 
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
