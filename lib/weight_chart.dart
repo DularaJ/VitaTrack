@@ -21,7 +21,6 @@ class _WeightChartPageState extends State<WeightChartPage> {
   double highestValue = 0;
   double lowestValue = 0;
   double averageValue = 0;
-  double averageBMI = 0;
   
   DateTime? startDate;
   DateTime? endDate;
@@ -114,7 +113,6 @@ class _WeightChartPageState extends State<WeightChartPage> {
       highestValue = 0;
       lowestValue = 0;
       averageValue = 0;
-      averageBMI = 0;
       return;
     }
 
@@ -125,34 +123,13 @@ class _WeightChartPageState extends State<WeightChartPage> {
         .whereType<double>()
         .toList();
     
-    List<double> bmis = data
-        .map((r) => (r['bmi'] as num?)?.toDouble())
-        .whereType<double>()
-        .toList();
-
     if (weights.isNotEmpty) {
       highestValue = weights.reduce((a, b) => a > b ? a : b);
       lowestValue = weights.reduce((a, b) => a < b ? a : b);
       averageValue = weights.reduce((a, b) => a + b) / weights.length;
     }
 
-    if (bmis.isNotEmpty) {
-      averageBMI = bmis.reduce((a, b) => a + b) / bmis.length;
-    }
-  }
-
-  String _getBMIStatus(double bmi) {
-    if (bmi < 18.5) return 'Underweight';
-    if (bmi < 25) return 'Normal';
-    if (bmi < 30) return 'Overweight';
-    return 'Obese';
-  }
-
-  Color _getBMIColor(double bmi) {
-    if (bmi < 18.5) return Colors.blue;
-    if (bmi < 25) return Colors.green;
-    if (bmi < 30) return Colors.orange;
-    return Colors.red;
+    // BMI removed from app; only weight statistics kept
   }
 
   Future<void> _selectDateRange() async {
@@ -203,7 +180,7 @@ class _WeightChartPageState extends State<WeightChartPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Weight & BMI Tracking'),
+        title: const Text('Weight Tracking'),
         backgroundColor: Colors.blue[800],
       ),
       body: isLoading
@@ -324,11 +301,7 @@ class _WeightChartPageState extends State<WeightChartPage> {
                                       color: Colors.purple,
                                     ),
                                     const SizedBox(width: 10),
-                                    _StatCard(
-                                      title: 'Avg BMI',
-                                      value: averageBMI.toStringAsFixed(1),
-                                      color: Colors.orange,
-                                    ),
+                                    // BMI stat removed
                                   ],
                                 ),
                               ),
@@ -458,7 +431,6 @@ class _WeightChartPageState extends State<WeightChartPage> {
                                 itemBuilder: (context, index) {
                                   final record = records[index];
                                   final weight = record['weight']?.toDouble() ?? 0.0;
-                                  final bmi = record['bmi']?.toDouble() ?? 0.0;
                                   final comment = record['comment'] ?? 'No comment';
                                   final time = record['time'] ?? 'Unknown';
                                   
@@ -469,7 +441,6 @@ class _WeightChartPageState extends State<WeightChartPage> {
                                       subtitle: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Text('BMI: ${bmi.toStringAsFixed(1)} - ${_getBMIStatus(bmi)}'),
                                           Text('Date: $time'),
                                           Text('Note: $comment'),
                                         ],
@@ -478,7 +449,8 @@ class _WeightChartPageState extends State<WeightChartPage> {
                                         icon: const Icon(Icons.delete, color: Colors.red),
                                         onPressed: () => _deleteRecord(record['id']),
                                       ),
-                                      tileColor: _getBMIColor(bmi).withOpacity(0.1),
+                                      // default tile color
+                                      tileColor: Colors.white,
                                     ),
                                   );
                                 },

@@ -308,6 +308,77 @@ class SupabaseRepository {
     await _client.from('sugar').delete().eq('id', id);
   }
 
+  // Insert a new weight record
+  Future<void> insertWeight({
+    required int userId,
+    String? time,
+    String? comment,
+    double? weight,
+  }) async {
+    await _client.from('weight').insert({
+      'user': userId,
+      'time': time,
+      'comment': comment,
+      'weight': weight,
+    });
+  }
+
+  // Fetch weight records for a user with optional date filter
+  Future<List<Map<String, dynamic>>> getWeightRecords(int userId, {
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    final response = await _client
+        .from('weight')
+        .select()
+        .eq('user', userId)
+        .order('time', ascending: false);
+    
+    // Filter by date in Dart if needed
+    if (startDate != null || endDate != null) {
+      // Normalize dates to midnight for comparison
+      final normalizedStart = startDate != null ? DateTime(startDate.year, startDate.month, startDate.day) : null;
+      final normalizedEnd = endDate != null ? DateTime(endDate.year, endDate.month, endDate.day) : null;
+      
+      return response.where((record) {
+        final timeStr = record['time'];
+        if (timeStr == null) return false;
+        final recordDate = DateTime.parse(timeStr);
+        final normalizedRecord = DateTime(recordDate.year, recordDate.month, recordDate.day);
+        
+        if (normalizedStart != null && normalizedRecord.isBefore(normalizedStart)) {
+          return false;
+        }
+        if (normalizedEnd != null && normalizedRecord.isAfter(normalizedEnd)) {
+          return false;
+        }
+        return true;
+      }).toList();
+    }
+    
+    return response;
+  }
+
+  // Update weight record
+  Future<void> updateWeight({
+    required int id,
+    String? time,
+    String? comment,
+    double? weight,
+  }) async {
+    final updates = <String, dynamic>{};
+    if (time != null) updates['time'] = time;
+    if (comment != null) updates['comment'] = comment;
+    if (weight != null) updates['weight'] = weight;
+
+    await _client.from('weight').update(updates).eq('id', id);
+  }
+
+  // Delete weight record
+  Future<void> deleteWeight(int id) async {
+    await _client.from('weight').delete().eq('id', id);
+  }
+
   // Sign out - clear session from shared preferences
   Future<void> signOut() async {
     final prefs = await SharedPreferences.getInstance();

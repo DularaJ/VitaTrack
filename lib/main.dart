@@ -9,6 +9,8 @@ import 'signin.dart';
 import 'signup.dart';
 import 'pressure_chart.dart';
 import 'sugar_chart.dart';
+import 'health_status.dart';
+import 'ui_widgets.dart';
 
 Future<void> main() async {
   await Supabase.initialize(
@@ -91,7 +93,7 @@ class MainPage extends StatefulWidget {
   State<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   TextEditingController nameController = TextEditingController();
   TextEditingController ageController = TextEditingController();
   TextEditingController bloodPressureController = TextEditingController();
@@ -108,10 +110,32 @@ class _MainPageState extends State<MainPage> {
   bool isLoading = true;
   Map<String, dynamic>? userData;
 
+  // Loading states for buttons
+  bool isBPLoading = false;
+  bool isSugarLoading = false;
+
+  // Success message visibility
+  bool showBPSuccess = false;
+  bool showSugarSuccess = false;
+
+  // Animation controller for fade-in
+  late AnimationController _fadeController;
+
   @override
   void initState() {
     super.initState();
+    _fadeController = AnimationController(
+      duration: Duration(milliseconds: 800),
+      vsync: this,
+    );
+    _fadeController.forward();
     _loadUserData();
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadUserData() async {
@@ -348,7 +372,33 @@ class _MainPageState extends State<MainPage> {
                                   borderSide: BorderSide(color: Colors.teal, width: 2),
                                 ),
                               ),
+                              onChanged: (value) => setState(() {}),
                             ),
+                            if (bloodPressureController.text.isNotEmpty)
+                              Padding(
+                                padding: EdgeInsets.only(top: 12),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Builder(builder: (context) {
+                                    try {
+                                      final parts =
+                                          bloodPressureController.text.split('/');
+                                      final systolic =
+                                          double.parse(parts[0].trim());
+                                      final status =
+                                          HealthStatus.getBloodPressureStatus(
+                                              systolic);
+                                      return StatusBadge(
+                                        status: status['status'],
+                                        color: status['color'],
+                                        icon: status['icon'],
+                                      );
+                                    } catch (e) {
+                                      return SizedBox.shrink();
+                                    }
+                                  }),
+                                ),
+                              ),
                             SizedBox(height: 15),
                             TextField(
                               controller: bloodPressureCommentController,
@@ -395,6 +445,8 @@ class _MainPageState extends State<MainPage> {
                                     return;
                                   }
 
+                                  setState(() => isBPLoading = true);
+
                                   try {
                                     // Parse blood pressure (expecting format like "120/80")
                                     List<String> parts = bp.split('/');
@@ -403,6 +455,7 @@ class _MainPageState extends State<MainPage> {
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(content: Text('Invalid blood pressure format')),
                                       );
+                                      setState(() => isBPLoading = false);
                                       return;
                                     }
 
@@ -429,6 +482,7 @@ class _MainPageState extends State<MainPage> {
                                           backgroundColor: Colors.red,
                                         ),
                                       );
+                                      setState(() => isBPLoading = false);
                                       return;
                                     }
 
@@ -447,16 +501,37 @@ class _MainPageState extends State<MainPage> {
                                     bloodPressureCommentController.clear();
                                     _resetDateTimeToCurrent();
 
+                                    // Show success message
+                                    setState(() {
+                                      showBPSuccess = true;
+                                      isBPLoading = false;
+                                    });
+
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text('Blood pressure record saved successfully!'),
+                                        content: SuccessMessage(
+                                          message: 'Blood pressure saved!',
+                                        ),
                                         backgroundColor: Colors.green,
+                                        behavior: SnackBarBehavior.floating,
                                       ),
                                     );
+
+                                    // Hide success message after 3 seconds
+                                    Future.delayed(Duration(seconds: 3), () {
+                                      setState(() => showBPSuccess = false);
+                                    });
                                   } catch (e) {
+                                    setState(() => isBPLoading = false);
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text('Failed to save record: $e'),
+                                        content: Row(
+                                          children: [
+                                            Icon(Icons.error, color: Colors.white),
+                                            SizedBox(width: 8),
+                                            Text('Failed to save: $e'),
+                                          ],
+                                        ),
                                         backgroundColor: Colors.red,
                                       ),
                                     );
@@ -482,8 +557,8 @@ class _MainPageState extends State<MainPage> {
                           ],
                         ),
                       ),
-                      SizedBox(width: 30),
-                      // Blood Sugar Section
+                      SizedBox(width: 40),
+                      // Blood Sugar Card
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -528,7 +603,31 @@ class _MainPageState extends State<MainPage> {
                                   borderSide: BorderSide(color: Colors.teal, width: 2),
                                 ),
                               ),
+                              onChanged: (value) => setState(() {}),
                             ),
+                            if (bloodSugarController.text.isNotEmpty)
+                              Padding(
+                                padding: EdgeInsets.only(top: 12),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Builder(builder: (context) {
+                                    try {
+                                      final value = double.parse(
+                                          bloodSugarController.text.trim());
+                                      final status =
+                                          HealthStatus.getBloodSugarStatus(
+                                              value);
+                                      return StatusBadge(
+                                        status: status['status'],
+                                        color: status['color'],
+                                        icon: status['icon'],
+                                      );
+                                    } catch (e) {
+                                      return SizedBox.shrink();
+                                    }
+                                  }),
+                                ),
+                              ),
                             SizedBox(height: 15),
                             TextField(
                               controller: bloodSugarCommentController,
@@ -575,6 +674,8 @@ class _MainPageState extends State<MainPage> {
                                     return;
                                   }
 
+                                  setState(() => isSugarLoading = true);
+
                                   try {
                                     // Parse blood sugar value
                                     double? sugarValue = double.tryParse(bs);
@@ -582,6 +683,7 @@ class _MainPageState extends State<MainPage> {
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(content: Text('Invalid blood sugar format')),
                                       );
+                                      setState(() => isSugarLoading = false);
                                       return;
                                     }
 
@@ -608,6 +710,7 @@ class _MainPageState extends State<MainPage> {
                                           backgroundColor: Colors.red,
                                         ),
                                       );
+                                      setState(() => isSugarLoading = false);
                                       return;
                                     }
 
@@ -626,16 +729,37 @@ class _MainPageState extends State<MainPage> {
                                     bloodSugarCommentController.clear();
                                     _resetDateTimeToCurrent();
 
+                                    // Show success message
+                                    setState(() {
+                                      showSugarSuccess = true;
+                                      isSugarLoading = false;
+                                    });
+
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text('Blood sugar record saved successfully!'),
+                                        content: SuccessMessage(
+                                          message: 'Blood sugar saved!',
+                                        ),
                                         backgroundColor: Colors.green,
+                                        behavior: SnackBarBehavior.floating,
                                       ),
                                     );
+
+                                    // Hide success message after 3 seconds
+                                    Future.delayed(Duration(seconds: 3), () {
+                                      setState(() => showSugarSuccess = false);
+                                    });
                                   } catch (e) {
+                                    setState(() => isSugarLoading = false);
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text('Failed to save record: $e'),
+                                        content: Row(
+                                          children: [
+                                            Icon(Icons.error, color: Colors.white),
+                                            SizedBox(width: 8),
+                                            Text('Failed to save: $e'),
+                                          ],
+                                        ),
                                         backgroundColor: Colors.red,
                                       ),
                                     );
@@ -707,7 +831,33 @@ class _MainPageState extends State<MainPage> {
                             borderSide: BorderSide(color: Colors.teal, width: 2),
                           ),
                         ),
+                        onChanged: (value) => setState(() {}),
                       ),
+                      if (bloodPressureController.text.isNotEmpty)
+                        Padding(
+                          padding: EdgeInsets.only(top: 12),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Builder(builder: (context) {
+                              try {
+                                final parts =
+                                    bloodPressureController.text.split('/');
+                                final systolic =
+                                    double.parse(parts[0].trim());
+                                final status =
+                                    HealthStatus.getBloodPressureStatus(
+                                        systolic);
+                                return StatusBadge(
+                                  status: status['status'],
+                                  color: status['color'],
+                                  icon: status['icon'],
+                                );
+                              } catch (e) {
+                                return SizedBox.shrink();
+                              }
+                            }),
+                          ),
+                        ),
                       SizedBox(height: 15),
                       TextField(
                         controller: bloodPressureCommentController,
@@ -880,7 +1030,30 @@ class _MainPageState extends State<MainPage> {
                             borderSide: BorderSide(color: Colors.teal, width: 2),
                           ),
                         ),
+                        onChanged: (value) => setState(() {}),
                       ),
+                      if (bloodSugarController.text.isNotEmpty)
+                        Padding(
+                          padding: EdgeInsets.only(top: 12),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Builder(builder: (context) {
+                              try {
+                                final value =
+                                    double.parse(bloodSugarController.text.trim());
+                                final status =
+                                    HealthStatus.getBloodSugarStatus(value);
+                                return StatusBadge(
+                                  status: status['status'],
+                                  color: status['color'],
+                                  icon: status['icon'],
+                                );
+                              } catch (e) {
+                                return SizedBox.shrink();
+                              }
+                            }),
+                          ),
+                        ),
                       SizedBox(height: 15),
                       TextField(
                         controller: bloodSugarCommentController,
