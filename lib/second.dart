@@ -3,7 +3,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'supabase.dart';
 import 'pressure_chart.dart';
 import 'sugar_chart.dart';
-import 'weight_chart.dart';
 
 class SecondPage extends StatefulWidget {
   const SecondPage({super.key});
@@ -284,6 +283,12 @@ class _SecondPageState extends State<SecondPage> {
                     labelText: 'Blood Pressure Value (mmHg)',
                     hintText: 'e.g., 120.5',
                     border: OutlineInputBorder(),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.teal, width: 2),
+                    ),
                   ),
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                 ),
@@ -293,6 +298,12 @@ class _SecondPageState extends State<SecondPage> {
                   decoration: InputDecoration(
                     labelText: 'Comment',
                     border: OutlineInputBorder(),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.teal, width: 2),
+                    ),
                   ),
                   maxLines: 2,
                 ),
@@ -374,6 +385,12 @@ class _SecondPageState extends State<SecondPage> {
                     labelText: 'Blood Sugar Value',
                     hintText: 'e.g., 110.5',
                     border: OutlineInputBorder(),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.teal, width: 2),
+                    ),
                   ),
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                 ),
@@ -383,6 +400,12 @@ class _SecondPageState extends State<SecondPage> {
                   decoration: InputDecoration(
                     labelText: 'Comment',
                     border: OutlineInputBorder(),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.teal, width: 2),
+                    ),
                   ),
                   maxLines: 2,
                 ),
@@ -580,30 +603,6 @@ class _SecondPageState extends State<SecondPage> {
                           ),
                         ),
                       ),
-                      SizedBox(width: 15),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => WeightChartPage()),
-                            );
-                          },
-                          icon: Icon(Icons.monitor_weight, color: Colors.white),
-                          label: Text(
-                            'Weight\nChart',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.white, fontSize: buttonFontSize),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.purple,
-                            padding: EdgeInsets.symmetric(vertical: 25),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ),
-                      ),
                     ],
                   )
                 : Column(
@@ -655,30 +654,6 @@ class _SecondPageState extends State<SecondPage> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 15),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => WeightChartPage()),
-                            );
-                          },
-                          icon: Icon(Icons.monitor_weight, color: Colors.white),
-                          label: Text(
-                            'Weight Chart',
-                            style: TextStyle(color: Colors.white, fontSize: buttonFontSize),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.purple,
-                            padding: EdgeInsets.symmetric(vertical: 20),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
             SizedBox(height: 30),
@@ -711,6 +686,10 @@ class _SecondPageState extends State<SecondPage> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                            ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                               borderSide: BorderSide(color: Colors.teal, width: 2),
@@ -731,6 +710,10 @@ class _SecondPageState extends State<SecondPage> {
                             suffixIcon: Icon(Icons.arrow_drop_down, color: Colors.teal),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
@@ -791,6 +774,10 @@ class _SecondPageState extends State<SecondPage> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                          ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Colors.teal, width: 2),
@@ -809,6 +796,10 @@ class _SecondPageState extends State<SecondPage> {
                           suffixIcon: Icon(Icons.arrow_drop_down, color: Colors.teal),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -909,31 +900,6 @@ class _SecondPageState extends State<SecondPage> {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: selectedTab == 1 ? Colors.white : Colors.orange,
-                            fontSize: tabFontSize,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedTab = 2;
-                        });
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 15),
-                        decoration: BoxDecoration(
-                          color: selectedTab == 2 ? Colors.purple : Colors.transparent,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          'Weight',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: selectedTab == 2 ? Colors.white : Colors.purple,
                             fontSize: tabFontSize,
                             fontWeight: FontWeight.bold,
                           ),
@@ -1082,47 +1048,6 @@ class _SecondPageState extends State<SecondPage> {
                         );
                       },
                     ),
-            ],
-            
-            // Weight Tab Content
-            if (selectedTab == 2) ...[
-              Center(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-                  child: Column(
-                    children: [
-                      Text(
-                        'View your Weight tracking chart',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: 20),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => WeightChartPage(),
-                            ),
-                          );
-                        },
-                        icon: Icon(Icons.show_chart),
-                        label: Text('Open Weight Chart'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.purple,
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 30,
-                            vertical: 15,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ],
           ],
         ),

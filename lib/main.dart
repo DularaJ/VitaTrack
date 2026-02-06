@@ -11,12 +11,14 @@ import 'pressure_chart.dart';
 import 'sugar_chart.dart';
 import 'health_status.dart';
 import 'ui_widgets.dart';
+import 'theme_manager.dart';
 
 Future<void> main() async {
   await Supabase.initialize(
     url: 'https://pjvrtberjycotelairrz.supabase.co',
     anonKey: 'sb_publishable_z1vq4lTS61JBzwke_JVz5Q_m79n-NrB',
   );
+  await ThemeManager.loadTheme();
   runApp(MyApp());
   print("supabase initialized");
 }
@@ -26,9 +28,26 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const AuthWrapper(),
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeManager.themeMode,
+      builder: (context, mode, _) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            primarySwatch: Colors.teal,
+            colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.teal).copyWith(secondary: Colors.tealAccent),
+            brightness: Brightness.light,
+          ),
+          darkTheme: ThemeData(
+            brightness: Brightness.dark,
+            primaryColor: Colors.teal,
+            colorScheme: ColorScheme.dark(primary: Colors.teal),
+            scaffoldBackgroundColor: const Color(0xFF121212),
+          ),
+          themeMode: mode,
+          home: const AuthWrapper(),
+        );
+      },
     );
   }
 }
@@ -229,6 +248,15 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
         backgroundColor: Colors.teal,
         elevation: 2,
         actions: [
+          ValueListenableBuilder<ThemeMode>(
+            valueListenable: ThemeManager.themeMode,
+            builder: (context, mode, _) {
+              return IconButton(
+                icon: Icon(mode == ThemeMode.dark ? Icons.dark_mode : Icons.light_mode, color: Colors.white),
+                onPressed: () => ThemeManager.toggle(),
+              );
+            },
+          ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16),
             child: IconButton(
@@ -367,6 +395,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                                ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide(color: Colors.teal, width: 2),
@@ -408,6 +440,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                                 prefixIcon: Icon(Icons.note, color: Colors.teal),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
@@ -598,6 +634,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                                ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide(color: Colors.teal, width: 2),
@@ -637,6 +677,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                                 prefixIcon: Icon(Icons.note, color: Colors.teal),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
@@ -826,6 +870,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                          ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Colors.teal, width: 2),
@@ -867,6 +915,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                           prefixIcon: Icon(Icons.note, color: Colors.teal),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -1025,6 +1077,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                          ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Colors.teal, width: 2),
@@ -1063,6 +1119,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                           prefixIcon: Icon(Icons.note, color: Colors.teal),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -1289,6 +1349,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
         suffixIcon: Icon(Icons.arrow_drop_down, color: Colors.teal),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
