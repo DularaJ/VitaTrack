@@ -12,6 +12,7 @@ import 'sugar_chart.dart';
 import 'health_status.dart';
 import 'ui_widgets.dart';
 import 'theme_manager.dart';
+import 'reminders.dart';
 
 Future<void> main() async {
   await Supabase.initialize(
@@ -265,6 +266,18 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => ProfilePage()),
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            child: IconButton(
+              icon: Icon(Icons.alarm, color: Colors.white, size: 26),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const RemindersPage()),
                 );
               },
             ),
