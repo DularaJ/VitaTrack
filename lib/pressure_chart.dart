@@ -220,6 +220,14 @@ class _PressureChartPageState extends State<PressureChartPage> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: Colors.red, width: 2),
+                              ),
                               filled: true,
                               fillColor: Colors.red[50],
                             ),
@@ -237,6 +245,14 @@ class _PressureChartPageState extends State<PressureChartPage> {
                               prefixIcon: const Icon(Icons.date_range, color: Colors.red),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: Colors.red, width: 2),
                               ),
                               filled: true,
                               fillColor: Colors.red[50],

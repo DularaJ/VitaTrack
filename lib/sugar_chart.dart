@@ -221,6 +221,14 @@ class _SugarChartPageState extends State<SugarChartPage> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: Colors.orange, width: 2),
+                              ),
                               filled: true,
                               fillColor: Colors.orange[50],
                             ),
@@ -238,6 +246,14 @@ class _SugarChartPageState extends State<SugarChartPage> {
                               prefixIcon: const Icon(Icons.date_range, color: Colors.orange),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: Colors.orange, width: 2),
                               ),
                               filled: true,
                               fillColor: Colors.orange[50],

@@ -19,6 +19,7 @@ class _SecondPageState extends State<SecondPage> {
   DateTime? endDate;
   TextEditingController startDateController = TextEditingController();
   TextEditingController endDateController = TextEditingController();
+  
 
   // User data
   Map<String, dynamic>? userData;
@@ -40,6 +41,14 @@ class _SecondPageState extends State<SecondPage> {
   void initState() {
     super.initState();
     _loadUserData();
+  }
+
+  @override
+  void dispose() {
+    startDateController.dispose();
+    endDateController.dispose();
+    
+    super.dispose();
   }
 
   Future<void> _loadUserData() async {
@@ -116,7 +125,6 @@ class _SecondPageState extends State<SecondPage> {
       );
       return;
     }
-
     setState(() {
       // Filter blood pressure records
       bloodPressureData = originalBloodPressureData.where((record) {
@@ -125,7 +133,6 @@ class _SecondPageState extends State<SecondPage> {
 
         bool matchesStart = startDate == null || !recordDate.isBefore(DateTime(startDate!.year, startDate!.month, startDate!.day));
         bool matchesEnd = endDate == null || !recordDate.isAfter(DateTime(endDate!.year, endDate!.month, endDate!.day));
-
         return matchesStart && matchesEnd;
       }).toList();
 
@@ -136,7 +143,6 @@ class _SecondPageState extends State<SecondPage> {
 
         bool matchesStart = startDate == null || !recordDate.isBefore(DateTime(startDate!.year, startDate!.month, startDate!.day));
         bool matchesEnd = endDate == null || !recordDate.isAfter(DateTime(endDate!.year, endDate!.month, endDate!.day));
-
         return matchesStart && matchesEnd;
       }).toList();
 
@@ -283,6 +289,12 @@ class _SecondPageState extends State<SecondPage> {
                     labelText: 'Blood Pressure Value (mmHg)',
                     hintText: 'e.g., 120.5',
                     border: OutlineInputBorder(),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.teal, width: 2),
+                    ),
                   ),
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                 ),
@@ -292,6 +304,12 @@ class _SecondPageState extends State<SecondPage> {
                   decoration: InputDecoration(
                     labelText: 'Comment',
                     border: OutlineInputBorder(),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.teal, width: 2),
+                    ),
                   ),
                   maxLines: 2,
                 ),
@@ -373,6 +391,12 @@ class _SecondPageState extends State<SecondPage> {
                     labelText: 'Blood Sugar Value',
                     hintText: 'e.g., 110.5',
                     border: OutlineInputBorder(),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.teal, width: 2),
+                    ),
                   ),
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                 ),
@@ -382,6 +406,12 @@ class _SecondPageState extends State<SecondPage> {
                   decoration: InputDecoration(
                     labelText: 'Comment',
                     border: OutlineInputBorder(),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.teal, width: 2),
+                    ),
                   ),
                   maxLines: 2,
                 ),
@@ -517,6 +547,7 @@ class _SecondPageState extends State<SecondPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SizedBox(height: 12),
             //View Chart Button
             Text(
               'View Charts',
@@ -662,6 +693,10 @@ class _SecondPageState extends State<SecondPage> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                            ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                               borderSide: BorderSide(color: Colors.teal, width: 2),
@@ -682,6 +717,10 @@ class _SecondPageState extends State<SecondPage> {
                             suffixIcon: Icon(Icons.arrow_drop_down, color: Colors.teal),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
@@ -742,6 +781,10 @@ class _SecondPageState extends State<SecondPage> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                          ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Colors.teal, width: 2),
@@ -760,6 +803,10 @@ class _SecondPageState extends State<SecondPage> {
                           suffixIcon: Icon(Icons.arrow_drop_down, color: Colors.teal),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.grey.shade400, width: 1.5),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -912,7 +959,7 @@ class _SecondPageState extends State<SecondPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Date: ${bloodPressureData[index]['date']} | Time: ${bloodPressureData[index]['time']}',
+                                  'ID: ${bloodPressureData[index]['id']} | Date: ${bloodPressureData[index]['date']} | Time: ${bloodPressureData[index]['time']}',
                                   style: TextStyle(fontSize: 12),
                                 ),
                                 if (bloodPressureData[index]['comment'].isNotEmpty)
@@ -981,7 +1028,7 @@ class _SecondPageState extends State<SecondPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Date: ${bloodSugarData[index]['date']} | Time: ${bloodSugarData[index]['time']}',
+                                   'ID: ${bloodSugarData[index]['id']} | Date: ${bloodSugarData[index]['date']} | Time: ${bloodSugarData[index]['time']}',
                                   style: TextStyle(fontSize: 12),
                                 ),
                                 if (bloodSugarData[index]['comment'].isNotEmpty)
